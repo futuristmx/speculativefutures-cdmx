@@ -1,3 +1,4 @@
+'use client';
 import { Reveal } from '@/components/ui/Reveal';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { WBtn } from '@/components/ui/WBtn';

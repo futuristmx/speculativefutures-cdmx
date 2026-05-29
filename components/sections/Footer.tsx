@@ -1,3 +1,4 @@
+'use client';
 import { Reveal } from '@/components/ui/Reveal';
 import { WLogo } from '@/components/ui/WLogo';
 import { WBtn } from '@/components/ui/WBtn';
