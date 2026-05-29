@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 180" aria-label="Speculative Futures CDMX">
+  <polygon points="33.51 48.75 139.57 24.09 107.74 128.8" fill="#439973"></polygon>
+  <circle cx="84.95" cy="85.8" r="25.79" fill="#FFFFFF" stroke="#439973" stroke-width="1.3"></circle>
+  <text transform="translate(132.36 101.11)" font-family="Gotham, system-ui, sans-serif" font-weight="800" font-size="26.98" fill="#439973" letter-spacing="-.5"><tspan x="0" y="0">SPECULATIVE</tspan><tspan x="0" y="25.05">FUTURES</tspan><tspan x="0" y="50.11">CDMX</tspan></text>
+</svg>

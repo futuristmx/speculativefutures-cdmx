@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SF CDMX · Foto de perfil</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:#062424;font-family:'Gotham',sans-serif;color:#F4F7F5}
+  .wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;padding:48px 24px}
+  .meta{font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#547476}
+  .row{display:flex;align-items:center;gap:56px;flex-wrap:wrap;justify-content:center}
+  .stack{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .ig-preview{width:160px;height:160px;border-radius:50%;overflow:hidden;border:2px solid #66EBAC;flex:0 0 160px}
+  .ig-preview svg{width:160px;height:160px;display:block}
+  .controls{display:flex;gap:12px;align-items:center}
+  button{font-family:'Gotham',sans-serif;font-weight:700;font-size:14px;cursor:pointer;border-radius:6px;padding:14px 24px;border:none}
+  .primary{background:#66EBAC;color:#062424}
+  .ghost{background:transparent;color:#C4D6CF;border:1px solid #114442}
+  .full{transform-origin:top left}
+  .frame{border:1px solid #114442;border-radius:12px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#66EBAC;color:#062424;font-weight:700;font-size:14px;padding:12px 22px;border-radius:6px;opacity:0;transition:opacity .2s;pointer-events:none}
+  #toast.on{opacity:1}
+</style>
+<script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="meta">@futures_mex · foto de perfil · 1080 × 1080</div>
+
+  <div class="row">
+    <!-- The exportable square (1080) scaled down for display -->
+    <div class="frame">
+      <div style="width:340px;height:340px;overflow:hidden">
+        <div id="avatar" class="full" style="transform:scale(0.31481)">
+          <!-- 1080 x 1080 canvas -->
+          <div style="width:1080px;height:1080px;background:#062424;position:relative;display:flex;align-items:center;justify-content:center">
+            <!-- subtle coordinate hairlines -->
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(to right,rgba(84,116,118,.06) 0 1px,transparent 1px 135px),repeating-linear-gradient(to bottom,rgba(84,116,118,.06) 0 1px,transparent 1px 135px)"></div>
+            <!-- mint ring -->
+            <div style="position:absolute;width:980px;height:980px;border-radius:50%;border:14px solid #66EBAC"></div>
+            <!-- isotype -->
+            <!-- isotype (tight viewBox → optically centered) -->
+            <svg width="600" height="592" viewBox="33.51 24.09 106.06 104.71" style="display:block;position:relative">
+              <polygon points="33.51 48.75 139.57 24.09 107.74 128.8" fill="#66EBAC"></polygon>
+              <circle cx="84.95" cy="85.8" r="25.79" fill="#062424" stroke="#66EBAC" stroke-width="3"></circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="meta">Así se ve en Instagram</div>
+      <div class="ig-preview">
+        <svg viewBox="33.51 24.09 106.06 104.71" preserveAspectRatio="xMidYMid meet" style="background:#062424;padding:22%">
+          <polygon points="33.51 48.75 139.57 24.09 107.74 128.8" fill="#66EBAC"></polygon>
+          <circle cx="84.95" cy="85.8" r="25.79" fill="#062424" stroke="#66EBAC" stroke-width="3"></circle>
+        </svg>
+      </div>
+      <div class="meta" style="color:#547476">Recorte circular</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="dl">Descargar PNG · 1080 × 1080</button>
+    <span class="meta" style="color:#547476">Fondo petróleo · marco menta · isotipo</span>
+  </div>
+</div>
+<div id="toast">PNG descargado</div>
+
+<script>
+  const toast = (m) => { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 2000); };
+  document.getElementById('dl').addEventListener('click', async () => {
+    const node = document.getElementById('avatar');
+    const prev = node.style.transform;
+    node.style.transform = 'scale(1)';
+    try {
+      if (document.fonts) await document.fonts.ready;
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+      const url = await window.htmlToImage.toPng(node.firstElementChild, { width: 1080, height: 1080, pixelRatio: 1, cacheBust: true, backgroundColor: '#062424' });
+      const a = document.createElement('a');
+      a.href = url; a.download = 'SF-CDMX_profile_1080.png'; a.click();
+      toast('PNG descargado');
+    } catch (e) { console.error(e); toast('Error al exportar'); }
+    node.style.transform = prev;
+  });
+</script>
+</body>
+</html>
