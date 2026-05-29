@@ -5,12 +5,6 @@ import { WIsotype } from '@/components/ui/WIsotype';
 import { WBtn } from '@/components/ui/WBtn';
 import { C, FONT, meta } from '@/lib/tokens';
 
-// To activate email delivery:
-// 1. Sign up at formspree.io with speculativefuturescdmx@gmail.com
-// 2. Create a new form → copy the endpoint (e.g. https://formspree.io/f/abcdefgh)
-// 3. Replace the value below
-const FORMSPREE_ENDPOINT = 'https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT';
-
 interface ContactFormOverlayProps {
   open: boolean;
   onClose: () => void;
@@ -48,10 +42,10 @@ export function ContactFormOverlay({ open, onClose }: ContactFormOverlayProps) {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(FORMSPREE_ENDPOINT, {
+      const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ ...form, _subject: 'Nueva consulta — Speculative Futures CDMX' }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
       if (res.ok) {
         setSent(true);
