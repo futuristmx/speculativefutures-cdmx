@@ -51,9 +51,9 @@ function HeroCTAs({ onJoin }: { onJoin: () => void }) {
 }
 
 /* ---- A · RED DE NODOS ---------------------------------------------------- */
-function HeroNodes({ onJoin, headline }: { onJoin: () => void; headline: number }) {
+function HeroNodes({ onJoin, headline, showGrid }: { onJoin: () => void; headline: number; showGrid: boolean }) {
   return (
-    <header id="top" style={{ ...HAIR, position: 'relative', overflow: 'hidden', padding: 'clamp(56px,8vw,96px) clamp(20px,5vw,64px) clamp(56px,8vw,88px)' }}>
+    <header id="top" style={{ ...(showGrid ? HAIR : {}), position: 'relative', overflow: 'hidden', padding: 'clamp(56px,8vw,96px) clamp(20px,5vw,64px) clamp(56px,8vw,88px)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0,1.05fr) minmax(0,.95fr)', gap: 'clamp(24px,4vw,56px)', alignItems: 'center' }} className="hero-grid">
         <div>
           <Reveal><HeroKicker /></Reveal>
@@ -69,12 +69,12 @@ function HeroNodes({ onJoin, headline }: { onJoin: () => void; headline: number 
 }
 
 /* ---- B · TERRITORIO DUOTONO ---------------------------------------------- */
-function HeroDuotone({ onJoin, headline }: { onJoin: () => void; headline: number }) {
+function HeroDuotone({ onJoin, headline, showGrid }: { onJoin: () => void; headline: number; showGrid: boolean }) {
   return (
     <header id="top" style={{ position: 'relative', overflow: 'hidden', minHeight: 'min(86vh,820px)', display: 'flex', alignItems: 'flex-end' }}>
       <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(160deg, #0a2c2b, ${C.PETROL} 70%)` }} />
       <div style={{ position: 'absolute', inset: 0, opacity: .45, backgroundImage: 'repeating-linear-gradient(22deg, rgba(67,153,115,.20) 0 2px, transparent 2px 10px)' }} />
-      <div style={{ position: 'absolute', inset: 0, backgroundImage: 'var(--hair-bg)' }} />
+      {showGrid && <div style={{ position: 'absolute', inset: 0, backgroundImage: 'var(--hair-bg)' }} />}
       <div style={{ position: 'absolute', right: '12%', top: '24%', width: '34vw', maxWidth: 520, aspectRatio: '1', background: 'radial-gradient(circle, rgba(102,235,172,.20), rgba(102,235,172,.05) 55%, transparent 70%)' }} />
       <div style={{ position: 'absolute', right: 'clamp(28px,8vw,140px)', top: '30%' }}>
         <WIsotype size={130} />
@@ -92,9 +92,9 @@ function HeroDuotone({ onJoin, headline }: { onJoin: () => void; headline: numbe
 }
 
 /* ---- C · MANIFIESTO EDITORIAL -------------------------------------------- */
-function HeroEditorial({ onJoin, headline }: { onJoin: () => void; headline: number }) {
+function HeroEditorial({ onJoin, headline, showGrid }: { onJoin: () => void; headline: number; showGrid: boolean }) {
   return (
-    <header id="top" style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(64px,10vw,128px) clamp(20px,5vw,64px) clamp(56px,8vw,96px)' }}>
+    <header id="top" style={{ ...(showGrid ? HAIR : {}), position: 'relative', overflow: 'hidden', padding: 'clamp(64px,10vw,128px) clamp(20px,5vw,64px) clamp(56px,8vw,96px)' }}>
       <div style={{ position: 'absolute', top: '-7%', right: '-5%', opacity: .9, pointerEvents: 'none' }}>
         <svg width="min(46vw,560px)" viewBox="0 0 165 150" style={{ display: 'block' }}>
           <polygon points="33.51 48.75 139.57 24.09 107.74 128.8" fill="none" stroke={C.PETROL7} strokeWidth="1.4" />
@@ -120,10 +120,11 @@ interface HeroProps {
   variant?: HeroVariant;
   onJoin: () => void;
   headline?: number;
+  showGrid?: boolean;
 }
 
-export function Hero({ variant = 'nodes', onJoin, headline = 0 }: HeroProps) {
-  if (variant === 'duotono') return <HeroDuotone onJoin={onJoin} headline={headline} />;
-  if (variant === 'editorial') return <HeroEditorial onJoin={onJoin} headline={headline} />;
-  return <HeroNodes onJoin={onJoin} headline={headline} />;
+export function Hero({ variant = 'nodes', onJoin, headline = 0, showGrid = true }: HeroProps) {
+  if (variant === 'duotono') return <HeroDuotone onJoin={onJoin} headline={headline} showGrid={showGrid} />;
+  if (variant === 'editorial') return <HeroEditorial onJoin={onJoin} headline={headline} showGrid={showGrid} />;
+  return <HeroNodes onJoin={onJoin} headline={headline} showGrid={showGrid} />;
 }

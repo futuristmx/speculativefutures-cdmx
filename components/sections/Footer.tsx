@@ -6,12 +6,13 @@ import { C, FONT, meta, HAIR } from '@/lib/tokens';
 interface FooterProps {
   onJoin: () => void;
   onComunidad: () => void;
+  showGrid?: boolean;
 }
 
-export function Footer({ onJoin, onComunidad }: FooterProps) {
+export function Footer({ onJoin, onComunidad, showGrid = true }: FooterProps) {
   return (
     <footer
-      style={{ ...HAIR, borderTop: `1px solid ${C.PETROL7}`, padding: 'clamp(72px,10vw,120px) clamp(20px,5vw,64px) 56px' }}
+      style={{ ...(showGrid ? HAIR : {}), borderTop: `1px solid ${C.PETROL7}`, padding: 'clamp(72px,10vw,120px) clamp(20px,5vw,64px) 56px' }}
     >
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <Reveal

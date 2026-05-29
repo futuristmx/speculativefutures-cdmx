@@ -8,11 +8,11 @@ const lines: [string, string, string][] = [
   ['Los futuros se imaginan, se disputan, se diseñan y ', 'se practican', '.'],
 ];
 
-export function Manifesto() {
+export function Manifesto({ showGrid = true }: { showGrid?: boolean }) {
   return (
     <section
       id="manifiesto"
-      style={{ ...HAIR, borderTop: `1px solid ${C.PETROL7}`, padding: 'clamp(64px,9vw,118px) clamp(20px,5vw,64px)' }}
+      style={{ ...(showGrid ? HAIR : {}), borderTop: `1px solid ${C.PETROL7}`, padding: 'clamp(64px,9vw,118px) clamp(20px,5vw,64px)' }}
     >
       <div style={{ maxWidth: 760, margin: '0 auto' }}>
         <Reveal><Eyebrow ix="03" label="Manifiesto" /></Reveal>

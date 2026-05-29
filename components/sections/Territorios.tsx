@@ -10,11 +10,11 @@ const TERR_DEFS: [string, string][] = [
   ['Tecnologías Emergentes', 'Lo técnico entendido desde su contexto y sus consecuencias.'],
 ];
 
-export function Territorios() {
+export function Territorios({ showGrid = true }: { showGrid?: boolean }) {
   return (
     <section
       id="territorios"
-      style={{ ...HAIR, borderTop: `1px solid ${C.PETROL7}`, padding: 'clamp(64px,9vw,112px) clamp(20px,5vw,64px)' }}
+      style={{ ...(showGrid ? HAIR : {}), borderTop: `1px solid ${C.PETROL7}`, padding: 'clamp(64px,9vw,112px) clamp(20px,5vw,64px)' }}
     >
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         <Reveal><Eyebrow ix="02" label="Cinco territorios" /></Reveal>

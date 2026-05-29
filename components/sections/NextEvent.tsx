@@ -5,10 +5,10 @@ import { NodeNetwork } from '@/components/ui/NodeNetwork';
 import { C, FONT, meta } from '@/lib/tokens';
 
 interface NextEventProps {
-  onJoin: () => void;
+  onContact: () => void;
 }
 
-export function NextEvent({ onJoin }: NextEventProps) {
+export function NextEvent({ onContact }: NextEventProps) {
   return (
     <section
       id="eventos"
@@ -32,7 +32,9 @@ export function NextEvent({ onJoin }: NextEventProps) {
         >
           <Reveal>
             <div style={{ height: 2, width: 48, background: C.MINT, marginBottom: 24 }} />
-            <div style={{ ...meta, color: C.MINT, fontSize: 14, marginBottom: 14 }}>Jue 26 jun · 19:30</div>
+            <div style={{ ...meta, color: C.MINT, fontSize: 14, marginBottom: 14 }}>
+              Próximamente · Online
+            </div>
             <h2
               style={{
                 fontFamily: FONT,
@@ -41,14 +43,11 @@ export function NextEvent({ onJoin }: NextEventProps) {
                 lineHeight: 1.08,
                 letterSpacing: '-.02em',
                 color: C.CAL,
-                margin: '0 0 16px',
+                margin: '0 0 20px',
               }}
             >
-              Señales débiles: leer la ciudad que viene
+              Primera sesión de la comunidad CDMX
             </h2>
-            <div style={{ ...meta, fontSize: 13, marginBottom: 20 }}>
-              Presencial · Colonia Roma, CDMX · Cupo limitado
-            </div>
             <p
               style={{
                 fontFamily: FONT,
@@ -60,10 +59,10 @@ export function NextEvent({ onJoin }: NextEventProps) {
                 margin: '0 0 28px',
               }}
             >
-              Una conversación sobre cómo detectar lo emergente en la trama urbana antes de que sea
-              evidente — y qué hacemos con esas lecturas.
+              Estamos definiendo el formato y la fecha. Si quieres participar o proponer un tema,
+              escríbenos — construimos esto juntos.
             </p>
-            <WBtn onClick={onJoin}>Reserva tu lugar</WBtn>
+            <WBtn onClick={onContact}>Más información</WBtn>
           </Reveal>
           <div
             style={{
