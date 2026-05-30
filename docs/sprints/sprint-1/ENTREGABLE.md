@@ -128,21 +128,29 @@ y marcada como pendiente de credenciales.
 | 8 | Seed crea capítulo, 5 territorios, aliado, curador core | **✅ CUMPLIDO — verificado en DB viva.** 1 capítulo cdmx, 5 territorios, 1 aliado Change, y `andres@change.live` promovido a `curador_core` con `onboarding_completado = true` y vínculo al aliado |
 | 9 | RLS senial: anónimo solo ve publicadas; core ve borradores | **CUMPLIDO (políticas activas en DB)** — RLS habilitada y políticas creadas; falta prueba de acceso diferenciado anon vs core con cliente real |
 | 10 | RLS Storage: avatars lectura pública; dossiers rechaza anónimo | **Pendiente** — el SQL de Storage requiere rol owner que el SQL Editor no tiene (`must be owner of table objects`). Se aplica desde el panel de Storage / con privilegios elevados. Ver DESV-4 |
-| 11 | `/es` y `/en` resuelven; banner inglés | **Implementado y compilado** (banner: string i18n presente; render en home se conecta en Sprint siguiente de UI) |
+| 11 | `/es` y `/en` resuelven; banner inglés | **Implementado y compilado.** Build genera ambas rutas; `messages/en.json` completado con todas las claves (auth/onboarding/dashboard) — ya sin `MISSING_MESSAGE`. Banner: string i18n presente; render en home se conecta en sprint de UI |
 | 12 | Huérfanos eliminados | **Cumplido** |
 | 13 | `TweaksWidget` fuera del bundle de producción | **Cumplido** (movido a dev + guard de entorno) |
 | 14 | `api/contact` lee email desde env | **Cumplido** |
 | 15 | README al estado real | **Cumplido** |
 | 16 | `styles/tokens.ts` único source of truth | **Cumplido** |
-| 17 | CI verde | **Workflow versionado**; corre al abrir el PR |
+| 17 | CI verde | **✅ CUMPLIDO — verificado.** El run del PR #1 pasa todos los pasos (prisma validate, generate, build design tokens, lint, typecheck, format check). Requirió 2 fixes: Node 22 en CI + generador de tokens sin la flag experimental |
 | 18 | `.env.example` completo | **Cumplido** |
 | 19 | Sección 13 ampliada con O7–O10 | **Cumplido** |
 
 **Resumen:** cumplidos y verificados — 5, 8 (en DB viva), 7, 9, 11, 12, 13, 14,
-15, 16, 18, 19. Parciales — 1, 2, 4 (código completo; ejecución por red/SMTP
-pendiente). Pendientes — 3 (integración Vercel↔Supabase), 6 (prueba en
-navegador), 10 (RLS de Storage por permisos). Detalle de las limitaciones de
-entorno en DESV-3 y DESV-4.
+15, 16, 17 (CI en verde), 18, 19. Parciales — 1, 2, 4 (código completo;
+ejecución por red/SMTP pendiente). Pendientes — 3 (integración
+Vercel↔Supabase), 6 (prueba en navegador), 10 (RLS de Storage por permisos).
+Detalle de las limitaciones de entorno en DESV-3 y DESV-4.
+
+**Configuración externa completada por el equipo (esta sesión):** base de datos
+montada en Supabase (schema + trigger + RLS + datos iniciales aplicados vía SQL
+Editor); usuario fundador creado y promovido a `curador_core`; SMTP de Resend
+conectado en Supabase Auth (sender de prueba `onboarding@resend.dev` mientras
+`speculativefutures.mx` termina de verificar en Resend); Redirect URLs de auth
+configuradas. Pendiente operativo: cargar variables en Vercel y primer deploy
+(A.3) para verificar criterios 4 y 6 end-to-end.
 
 ---
 
