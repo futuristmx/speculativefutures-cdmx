@@ -31,7 +31,9 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
   // Lock body scroll while mobile menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [menuOpen]);
 
   return (
@@ -56,7 +58,10 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
         </a>
 
         {/* Desktop menu */}
-        <div className="nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(14px,2.4vw,30px)' }}>
+        <div
+          className="nav-desktop"
+          style={{ display: 'flex', alignItems: 'center', gap: 'clamp(14px,2.4vw,30px)' }}
+        >
           <div style={{ display: 'flex', gap: 'clamp(14px,2.2vw,28px)' }}>
             {links.map(([label, href]) => (
               <a
@@ -72,7 +77,15 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
           <button
             onClick={onComunidad}
             className="nav-link"
-            style={{ ...meta, color: C.CAL, fontSize: 12.5, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{
+              ...meta,
+              color: C.CAL,
+              fontSize: 12.5,
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+            }}
           >
             Comunidad
           </button>
@@ -85,7 +98,7 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
           className="nav-hamburger"
           aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
           aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(o => !o)}
+          onClick={() => setMenuOpen((o) => !o)}
           style={{
             display: 'none',
             flexDirection: 'column',
@@ -99,9 +112,39 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
             padding: 8,
           }}
         >
-          <span style={{ display: 'block', height: 2, width: 22, background: C.CAL, borderRadius: 2, transition: 'transform .25s, opacity .2s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
-          <span style={{ display: 'block', height: 2, width: 22, background: C.CAL, borderRadius: 2, transition: 'opacity .2s', opacity: menuOpen ? 0 : 1 }} />
-          <span style={{ display: 'block', height: 2, width: 22, background: C.CAL, borderRadius: 2, transition: 'transform .25s, opacity .2s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
+          <span
+            style={{
+              display: 'block',
+              height: 2,
+              width: 22,
+              background: C.CAL,
+              borderRadius: 2,
+              transition: 'transform .25s, opacity .2s',
+              transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
+            }}
+          />
+          <span
+            style={{
+              display: 'block',
+              height: 2,
+              width: 22,
+              background: C.CAL,
+              borderRadius: 2,
+              transition: 'opacity .2s',
+              opacity: menuOpen ? 0 : 1,
+            }}
+          />
+          <span
+            style={{
+              display: 'block',
+              height: 2,
+              width: 22,
+              background: C.CAL,
+              borderRadius: 2,
+              transition: 'transform .25s, opacity .2s',
+              transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
+            }}
+          />
         </button>
       </nav>
 
@@ -139,13 +182,20 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
               borderBottom: `1px solid ${C.PETROL7}`,
             }}
           >
-            <span style={{ color: C.MINT, fontSize: 14, fontWeight: 500, marginRight: 14 }}>0{i + 1}</span>
+            <span
+              style={{ color: C.MINT, fontSize: 14, fontWeight: 500, marginRight: 14 }}
+            >
+              0{i + 1}
+            </span>
             {label}
           </a>
         ))}
 
         <button
-          onClick={() => { setMenuOpen(false); onComunidad(); }}
+          onClick={() => {
+            setMenuOpen(false);
+            onComunidad();
+          }}
           style={{
             fontFamily: FONT,
             fontWeight: 700,
@@ -160,12 +210,27 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
             cursor: 'pointer',
           }}
         >
-          <span style={{ color: C.MINT, fontSize: 14, fontWeight: 500, marginRight: 14 }}>05</span>
+          <span style={{ color: C.MINT, fontSize: 14, fontWeight: 500, marginRight: 14 }}>
+            05
+          </span>
           Comunidad
         </button>
 
-        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 24, paddingTop: 32 }}>
-          <div onClick={() => { setMenuOpen(false); onJoin(); }}>
+        <div
+          style={{
+            marginTop: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 24,
+            paddingTop: 32,
+          }}
+        >
+          <div
+            onClick={() => {
+              setMenuOpen(false);
+              onJoin();
+            }}
+          >
             <WBtn onClick={onJoin}>Únete a la comunidad</WBtn>
           </div>
           <InstagramLink size={22} label />

@@ -4,19 +4,42 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run tokens:build && prisma generate",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "tokens:build": "node scripts/build-tokens.mjs",
+    "db:apply-policies": "node scripts/apply-policies.mjs",
+    "db:setup": "prisma migrate deploy && npm run db:apply-policies",
+    "db:seed": "node --experimental-strip-types prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "node --experimental-strip-types prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.106.2",
     "next": "14.2.29",
+    "next-intl": "^4.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "resend": "^6.12.4"
+    "resend": "^6.12.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "14.2.29",
+    "prettier": "^3.8.3",
+    "prisma": "^6.19.3",
     "typescript": "^5"
   }
 }

@@ -34,28 +34,41 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
         flexShrink: 0,
       }}
     >
-      <span style={{
-        position: 'absolute',
-        top: 3,
-        left: on ? 19 : 3,
-        width: 16,
-        height: 16,
-        borderRadius: '50%',
-        background: on ? C.PETROL : C.SLATE,
-        transition: 'left .18s',
-      }} />
+      <span
+        style={{
+          position: 'absolute',
+          top: 3,
+          left: on ? 19 : 3,
+          width: 16,
+          height: 16,
+          borderRadius: '50%',
+          background: on ? C.PETROL : C.SLATE,
+          transition: 'left .18s',
+        }}
+      />
     </button>
   );
 }
 
-function SegmentedControl({ options, value, onChange }: {
+function SegmentedControl({
+  options,
+  value,
+  onChange,
+}: {
   options: string[];
   value: string;
   onChange: (v: string) => void;
 }) {
   return (
-    <div style={{ display: 'flex', border: `1px solid ${C.PETROL7}`, borderRadius: 6, overflow: 'hidden' }}>
-      {options.map(opt => (
+    <div
+      style={{
+        display: 'flex',
+        border: `1px solid ${C.PETROL7}`,
+        borderRadius: 6,
+        overflow: 'hidden',
+      }}
+    >
+      {options.map((opt) => (
         <button
           key={opt}
           onClick={() => onChange(opt)}
@@ -82,8 +95,18 @@ function SegmentedControl({ options, value, onChange }: {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, minHeight: 32 }}>
-      <span style={{ fontFamily: FONT, fontWeight: 400, fontSize: 13.5, color: C.BODY }}>{label}</span>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 12,
+        minHeight: 32,
+      }}
+    >
+      <span style={{ fontFamily: FONT, fontWeight: 400, fontSize: 13.5, color: C.BODY }}>
+        {label}
+      </span>
       {children}
     </div>
   );
@@ -91,15 +114,30 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 
 function SectionLabel({ label }: { label: string }) {
   return (
-    <div style={{ ...meta, color: C.SLATE, fontSize: 10.5, paddingBottom: 8, borderBottom: `1px solid ${C.PETROL7}`, marginBottom: 2 }}>
+    <div
+      style={{
+        ...meta,
+        color: C.SLATE,
+        fontSize: 10.5,
+        paddingBottom: 8,
+        borderBottom: `1px solid ${C.PETROL7}`,
+        marginBottom: 2,
+      }}
+    >
       {label}
     </div>
   );
 }
 
 export function TweaksWidget({
-  variant, headline, showGrid, showMotion,
-  onVariant, onHeadline, onGrid, onMotion,
+  variant,
+  headline,
+  showGrid,
+  showMotion,
+  onVariant,
+  onHeadline,
+  onGrid,
+  onMotion,
 }: TweaksWidgetProps) {
   const [visible, setVisible] = useState(true);
 
@@ -136,8 +174,8 @@ export function TweaksWidget({
             boxShadow: '0 4px 20px rgba(0,0,0,.4)',
             transition: 'border-color .18s',
           }}
-          onMouseEnter={e => (e.currentTarget.style.borderColor = C.MINT)}
-          onMouseLeave={e => (e.currentTarget.style.borderColor = C.PETROL7)}
+          onMouseEnter={(e) => (e.currentTarget.style.borderColor = C.MINT)}
+          onMouseLeave={(e) => (e.currentTarget.style.borderColor = C.PETROL7)}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <circle cx="7" cy="7" r="2.5" fill={C.MINT} />
@@ -171,46 +209,89 @@ export function TweaksWidget({
           }}
         >
           {/* header */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '12px 14px 11px',
-            borderBottom: `1px solid ${C.PETROL7}`,
-          }}>
-            <span style={{ fontFamily: FONT, fontWeight: 700, fontSize: 13, color: C.CAL, letterSpacing: '.03em' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '12px 14px 11px',
+              borderBottom: `1px solid ${C.PETROL7}`,
+            }}
+          >
+            <span
+              style={{
+                fontFamily: FONT,
+                fontWeight: 700,
+                fontSize: 13,
+                color: C.CAL,
+                letterSpacing: '.03em',
+              }}
+            >
               Tweaks
             </span>
             <button
               onClick={() => setVisible(false)}
-              style={{ background: 'none', border: 'none', color: C.SLATE, fontSize: 18, cursor: 'pointer', lineHeight: 1, padding: '0 2px' }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: C.SLATE,
+                fontSize: 18,
+                cursor: 'pointer',
+                lineHeight: 1,
+                padding: '0 2px',
+              }}
             >
               ×
             </button>
           </div>
 
           {/* body */}
-          <div style={{ padding: '14px 14px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div
+            style={{
+              padding: '14px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+            }}
+          >
             <SectionLabel label="HERO" />
 
             <div>
-              <span style={{ fontFamily: FONT, fontWeight: 400, fontSize: 13, color: C.BODY, display: 'block', marginBottom: 8 }}>
+              <span
+                style={{
+                  fontFamily: FONT,
+                  fontWeight: 400,
+                  fontSize: 13,
+                  color: C.BODY,
+                  display: 'block',
+                  marginBottom: 8,
+                }}
+              >
                 Dirección
               </span>
               <SegmentedControl
                 options={['nodes', 'duotono', 'editorial']}
                 value={variant}
-                onChange={v => onVariant(v as HeroVariant)}
+                onChange={(v) => onVariant(v as HeroVariant)}
               />
             </div>
 
             <div>
-              <span style={{ fontFamily: FONT, fontWeight: 400, fontSize: 13, color: C.BODY, display: 'block', marginBottom: 6 }}>
+              <span
+                style={{
+                  fontFamily: FONT,
+                  fontWeight: 400,
+                  fontSize: 13,
+                  color: C.BODY,
+                  display: 'block',
+                  marginBottom: 6,
+                }}
+              >
                 Titular
               </span>
               <select
                 value={headline}
-                onChange={e => onHeadline(Number(e.target.value))}
+                onChange={(e) => onHeadline(Number(e.target.value))}
                 style={{
                   width: '100%',
                   background: C.PETROL,
@@ -225,7 +306,9 @@ export function TweaksWidget({
                 }}
               >
                 {HEADLINES.map((h, i) => (
-                  <option key={i} value={i}>{h}</option>
+                  <option key={i} value={i}>
+                    {h}
+                  </option>
                 ))}
               </select>
             </div>

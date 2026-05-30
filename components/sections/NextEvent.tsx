@@ -20,7 +20,9 @@ export function NextEvent({ onContact }: NextEventProps) {
         }}
       >
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <Reveal><Eyebrow ix="01" label="Próximo evento" /></Reveal>
+          <Reveal>
+            <Eyebrow ix="01" label="Próximo evento" />
+          </Reveal>
           <div
             style={{
               display: 'grid',
@@ -32,7 +34,9 @@ export function NextEvent({ onContact }: NextEventProps) {
             className="event-grid"
           >
             <div>
-              <div style={{ height: 2, width: 48, background: C.MINT, marginBottom: 24 }} />
+              <div
+                style={{ height: 2, width: 48, background: C.MINT, marginBottom: 24 }}
+              />
               <div style={{ ...meta, color: C.MINT, fontSize: 14, marginBottom: 14 }}>
                 Próximamente · Online
               </div>
@@ -60,8 +64,8 @@ export function NextEvent({ onContact }: NextEventProps) {
                   margin: '0 0 28px',
                 }}
               >
-                Estamos definiendo el formato y la fecha. Si quieres participar o proponer un tema,
-                escríbenos — construimos esto juntos.
+                Estamos definiendo el formato y la fecha. Si quieres participar o proponer
+                un tema, escríbenos — construimos esto juntos.
               </p>
               <button
                 onClick={onContact}

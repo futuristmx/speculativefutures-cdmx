@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const DESTINATION = 'speculativefuturescdmx@gmail.com';
+// Destinatario y remitente parametrizados por entorno (sin hardcoding).
+const DESTINATION = process.env.CONTACT_TO ?? 'speculativefuturescdmx@gmail.com';
+const SENDER =
+  process.env.CONTACT_FROM ?? 'Speculative Futures CDMX <onboarding@resend.dev>';
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -23,7 +26,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { error } = await resend.emails.send({
-    from: 'Speculative Futures CDMX <onboarding@resend.dev>',
+    from: SENDER,
     to: DESTINATION,
     replyTo: email,
     subject: `Consulta de ${nombre} — Speculative Futures CDMX`,

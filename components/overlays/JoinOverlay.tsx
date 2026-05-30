@@ -12,21 +12,45 @@ interface JoinOverlayProps {
 
 export function JoinOverlay({ open, onClose }: JoinOverlayProps) {
   const [sent, setSent] = useState(false);
-  useEffect(() => { if (open) setSent(false); }, [open]);
+  useEffect(() => {
+    if (open) setSent(false);
+  }, [open]);
   if (!open) return null;
 
   return (
     <Overlay onClose={onClose}>
-      <div style={{ marginBottom: 18 }}><WIsotype size={46} /></div>
+      <div style={{ marginBottom: 18 }}>
+        <WIsotype size={46} />
+      </div>
       {!sent ? (
         <>
-          <h3 style={{ fontFamily: FONT, fontWeight: 700, fontSize: 26, color: C.CAL, margin: '0 0 10px', letterSpacing: '-.01em' }}>
+          <h3
+            style={{
+              fontFamily: FONT,
+              fontWeight: 700,
+              fontSize: 26,
+              color: C.CAL,
+              margin: '0 0 10px',
+              letterSpacing: '-.01em',
+            }}
+          >
             Únete a la comunidad
           </h3>
-          <p style={{ fontFamily: FONT, fontWeight: 500, fontSize: 15, lineHeight: 1.55, color: C.BODY, margin: '0 0 24px' }}>
+          <p
+            style={{
+              fontFamily: FONT,
+              fontWeight: 500,
+              fontSize: 15,
+              lineHeight: 1.55,
+              color: C.BODY,
+              margin: '0 0 24px',
+            }}
+          >
             Te avisamos de señales, voces y eventos. Sin ruido.
           </p>
-          <label style={{ ...meta, color: C.BODY, display: 'block', marginBottom: 8 }}>Correo</label>
+          <label style={{ ...meta, color: C.BODY, display: 'block', marginBottom: 8 }}>
+            Correo
+          </label>
           <input
             placeholder="tu@correo.com"
             style={{
@@ -48,11 +72,30 @@ export function JoinOverlay({ open, onClose }: JoinOverlayProps) {
         </>
       ) : (
         <>
-          <h3 style={{ fontFamily: FONT, fontWeight: 700, fontSize: 26, color: C.MINT, margin: '0 0 10px', letterSpacing: '-.01em' }}>
+          <h3
+            style={{
+              fontFamily: FONT,
+              fontWeight: 700,
+              fontSize: 26,
+              color: C.MINT,
+              margin: '0 0 10px',
+              letterSpacing: '-.01em',
+            }}
+          >
             Señal recibida.
           </h3>
-          <p style={{ fontFamily: FONT, fontWeight: 500, fontSize: 15, lineHeight: 1.55, color: C.BODY, margin: 0 }}>
-            Te escribimos pronto. Mientras, propón una conversación por DM en @futures_mex.
+          <p
+            style={{
+              fontFamily: FONT,
+              fontWeight: 500,
+              fontSize: 15,
+              lineHeight: 1.55,
+              color: C.BODY,
+              margin: 0,
+            }}
+          >
+            Te escribimos pronto. Mientras, propón una conversación por DM en
+            @futures_mex.
           </p>
         </>
       )}

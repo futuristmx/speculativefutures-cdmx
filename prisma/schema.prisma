@@ -20,8 +20,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")  // conexión vía pgbouncer (pooled)
-  directUrl = env("DIRECT_URL")    // conexión directa para migraciones
+  url       = env("DATABASE_URL") // conexión vía pgbouncer (pooled)
+  directUrl = env("DIRECT_URL") // conexión directa para migraciones
 }
 
 // ===========================================================================
@@ -162,23 +162,23 @@ enum EstadoSuscripcion {
 /// Capítulo de la red Speculative Futures. Durante el MDP existe un único
 /// registro ('cdmx'); el modelo está listo para sumar capítulos sin migración.
 model Capitulo {
-  id           String   @id @default(uuid()) @db.Uuid
-  codigo       String   @unique // identificador legible, ej. "cdmx"
-  nombre       String
-  descripcion  String?
-  ciudad       String?
-  pais         String?  @default("México")
-  activo       Boolean  @default(true)
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id          String   @id @default(uuid()) @db.Uuid
+  codigo      String   @unique // identificador legible, ej. "cdmx"
+  nombre      String
+  descripcion String?
+  ciudad      String?
+  pais        String?  @default("México")
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  miembros     Miembro[]
-  territorios  Territorio[]
-  seniales     Senial[]
-  eventos      Evento[]
-  piezas       PiezaEditorial[]
-  aliados      AliadoFundador[]
-  sponsors     Sponsor[]
+  miembros    Miembro[]
+  territorios Territorio[]
+  seniales    Senial[]
+  eventos     Evento[]
+  piezas      PiezaEditorial[]
+  aliados     AliadoFundador[]
+  sponsors    Sponsor[]
 
   @@map("capitulo")
 }
@@ -191,31 +191,41 @@ model Capitulo {
 /// El registro de Miembro se crea por trigger en la base al insertarse el
 /// auth.users correspondiente (ver Sección 5 del documento de arquitectura).
 model Miembro {
-  id                          String          @id @default(uuid()) @db.Uuid
-  userId                      String          @unique @map("user_id") @db.Uuid // = auth.users.id
-  capituloId                  String          @map("capitulo_id") @db.Uuid
-  nombre                      String
-  email                       String
-  foto                        String?
-  disciplina                  String?
-  motivacion                  String?
-  bioCorta                    String?         @map("bio_corta")
-  enlacesExternos             Json?           @map("enlaces_externos")
-  rolContribucion             RolContribucion @default(regular) @map("rol_contribucion")
+  id                             String          @id @default(uuid()) @db.Uuid
+  /// = auth.users.id. Obligatorio y único: todo Miembro corresponde a un
+  /// auth.users de Supabase. El registro lo crea el trigger handle_new_user
+  /// al insertarse el auth.users; el curador core inicial se crea en el seed
+  /// vía Admin API (createUser dispara el trigger). Ver ARQUITECTURA §5.6.
+  userId                         String          @unique @map("user_id") @db.Uuid
+  capituloId                     String          @map("capitulo_id") @db.Uuid
+  nombre                         String
+  email                          String
+  foto                           String?
+  disciplina                     String?
+  motivacion                     String?
+  bioCorta                       String?         @map("bio_corta")
+  enlacesExternos                Json?           @map("enlaces_externos")
+  rolContribucion                RolContribucion @default(regular) @map("rol_contribucion")
   /// Contador de señales aprobadas; gobierna la calibración de entrada.
   /// Si rolContribucion = curador_comunidad y este valor < 3 → cola de revisión.
   /// Si >= 3 → publicación directa con auditoría post-hoc (auditada = false).
-  senialesPublicadasAprobadas Int             @default(0) @map("seniales_publicadas_aprobadas")
-  estado                      EstadoMiembro   @default(activo)
+  senialesPublicadasAprobadas    Int             @default(0) @map("seniales_publicadas_aprobadas")
+  /// (O6) El middleware redirige a /onboarding mientras sea false. El trigger
+  /// lo crea en false; se marca true al completar el onboarding obligatorio.
+  onboardingCompletado           Boolean         @default(false) @map("onboarding_completado")
+  /// (O5) Cuota blanda informativa de 1 señal/mes para Curador Comunidad.
+  /// Sin enforcement técnico; alimenta el mensaje del dashboard (Sprint 4).
+  fechaUltimaPublicacionAprobada DateTime?       @map("fecha_ultima_publicacion_aprobada")
+  estado                         EstadoMiembro   @default(activo)
   /// Vínculo opcional (muchos-a-uno) con el aliado fundador que el miembro
   /// representa. NO otorga rol_contribucion especial — es solo afiliación
   /// institucional. El rol de permisos "aliado_fundador" se deriva de este
   /// vínculo a nivel de aplicación, sin alterar rol_contribucion.
-  aliadoFundadorId            String?         @map("aliado_fundador_id") @db.Uuid
+  aliadoFundadorId               String?         @map("aliado_fundador_id") @db.Uuid
   /// Rol del miembro dentro del aliado (texto libre, ej. "Directora de foresight").
-  rolEnAliado                 String?         @map("rol_en_aliado")
-  fechaRegistro               DateTime        @default(now()) @map("fecha_registro")
-  updatedAt                   DateTime        @updatedAt @map("updated_at")
+  rolEnAliado                    String?         @map("rol_en_aliado")
+  fechaRegistro                  DateTime        @default(now()) @map("fecha_registro")
+  updatedAt                      DateTime        @updatedAt @map("updated_at")
 
   capitulo             Capitulo         @relation(fields: [capituloId], references: [id], onDelete: Cascade)
   aliadoFundador       AliadoFundador?  @relation("MiembroAliado", fields: [aliadoFundadorId], references: [id], onDelete: SetNull)
@@ -237,7 +247,7 @@ model Miembro {
 model Territorio {
   id          String   @id @default(uuid()) @db.Uuid
   capituloId  String   @map("capitulo_id") @db.Uuid
-  codigo      String   // ej. "futuros", "ciudad_sistemas_vivos"
+  codigo      String // ej. "futuros", "ciudad_sistemas_vivos"
   nombre      String
   descripcion String?
   orden       Int      @default(0)
@@ -259,27 +269,27 @@ model Territorio {
 
 /// Unidad de inteligencia de futuros. Núcleo del repositorio del capítulo.
 model Senial {
-  id                      String             @id @default(uuid()) @db.Uuid
-  capituloId              String             @map("capitulo_id") @db.Uuid
-  titulo                  String
-  descripcion            String
-  fuenteUrl               String?            @map("fuente_url")
-  fuenteDescripcion       String?            @map("fuente_descripcion")
-  territorioId            String             @map("territorio_id") @db.Uuid
-  curadorId               String             @map("curador_id") @db.Uuid
-  tipo                    TipoSenial
-  horizonteTemporal       HorizonteTemporal? @map("horizonte_temporal")
-  interpretacionEstrategica String?          @map("interpretacion_estrategica")
-  estado                  EstadoSenial       @default(borrador)
+  id                        String             @id @default(uuid()) @db.Uuid
+  capituloId                String             @map("capitulo_id") @db.Uuid
+  titulo                    String
+  descripcion               String
+  fuenteUrl                 String?            @map("fuente_url")
+  fuenteDescripcion         String?            @map("fuente_descripcion")
+  territorioId              String             @map("territorio_id") @db.Uuid
+  curadorId                 String             @map("curador_id") @db.Uuid
+  tipo                      TipoSenial
+  horizonteTemporal         HorizonteTemporal? @map("horizonte_temporal")
+  interpretacionEstrategica String?            @map("interpretacion_estrategica")
+  estado                    EstadoSenial       @default(borrador)
   /// Idiomas en que existe la señal. Default español; no se traduce
   /// automáticamente (lineamientos §5).
-  idiomas                 String[]           @default(["es"])
+  idiomas                   String[]           @default(["es"])
   /// false hasta que un Curador Core la audita post-publicación directa.
-  auditada                Boolean            @default(false)
-  fechaCaptura            DateTime           @default(now()) @map("fecha_captura")
-  fechaPublicacion        DateTime?          @map("fecha_publicacion")
-  createdAt               DateTime           @default(now()) @map("created_at")
-  updatedAt               DateTime           @updatedAt @map("updated_at")
+  auditada                  Boolean            @default(false)
+  fechaCaptura              DateTime           @default(now()) @map("fecha_captura")
+  fechaPublicacion          DateTime?          @map("fecha_publicacion")
+  createdAt                 DateTime           @default(now()) @map("created_at")
+  updatedAt                 DateTime           @updatedAt @map("updated_at")
 
   capitulo   Capitulo         @relation(fields: [capituloId], references: [id], onDelete: Cascade)
   territorio Territorio       @relation(fields: [territorioId], references: [id])
@@ -327,25 +337,25 @@ model RevisionSenial {
 
 /// Producción de la comunidad (sesión, charla, taller).
 model Evento {
-  id               String          @id @default(uuid()) @db.Uuid
-  capituloId       String          @map("capitulo_id") @db.Uuid
-  titulo           String
-  descripcion      String
-  territorioId     String?         @map("territorio_id") @db.Uuid
-  modalidad        ModalidadEvento
-  estado           EstadoEvento    @default(borrador)
-  fechaInicio      DateTime        @map("fecha_inicio")
-  fechaFin         DateTime?       @map("fecha_fin")
-  ubicacion        String?
-  capacidad        Int?
+  id                 String          @id @default(uuid()) @db.Uuid
+  capituloId         String          @map("capitulo_id") @db.Uuid
+  titulo             String
+  descripcion        String
+  territorioId       String?         @map("territorio_id") @db.Uuid
+  modalidad          ModalidadEvento
+  estado             EstadoEvento    @default(borrador)
+  fechaInicio        DateTime        @map("fecha_inicio")
+  fechaFin           DateTime?       @map("fecha_fin")
+  ubicacion          String?
+  capacidad          Int?
   /// Idiomas del evento (default español; en+es si hay ponentes internacionales).
-  idiomas          String[]        @default(["es"])
+  idiomas            String[]        @default(["es"])
   /// Ponentes embebidos como JSON (nombre, bio, foto, enlace) — no requieren
   /// ser miembros del sistema.
-  ponentes         Json?
-  recursosPostEvento Json?         @map("recursos_post_evento")
-  createdAt        DateTime        @default(now()) @map("created_at")
-  updatedAt        DateTime        @updatedAt @map("updated_at")
+  ponentes           Json?
+  recursosPostEvento Json?           @map("recursos_post_evento")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
 
   capitulo          Capitulo    @relation(fields: [capituloId], references: [id], onDelete: Cascade)
   territorio        Territorio? @relation(fields: [territorioId], references: [id])
@@ -380,25 +390,25 @@ model RSVP {
 
 /// Pieza editorial: ensayo, dossier, reporte o briefing.
 model PiezaEditorial {
-  id              String      @id @default(uuid()) @db.Uuid
-  capituloId      String      @map("capitulo_id") @db.Uuid
-  tipo            TipoPieza
-  titulo          String
-  contenido       String      @db.Text
-  autorId         String      @map("autor_id") @db.Uuid
-  territorioId    String?     @map("territorio_id") @db.Uuid
-  estado          EstadoPieza @default(borrador)
-  idiomas         String[]    @default(["es"])
+  id               String      @id @default(uuid()) @db.Uuid
+  capituloId       String      @map("capitulo_id") @db.Uuid
+  tipo             TipoPieza
+  titulo           String
+  contenido        String      @db.Text
+  autorId          String      @map("autor_id") @db.Uuid
+  territorioId     String?     @map("territorio_id") @db.Uuid
+  estado           EstadoPieza @default(borrador)
+  idiomas          String[]    @default(["es"])
   /// Reservado para Horizonte 2 (monetización). Siempre false en el MDP.
-  accesoPremium   Boolean     @default(false) @map("acceso_premium")
-  fechaPublicacion DateTime?  @map("fecha_publicacion")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
+  accesoPremium    Boolean     @default(false) @map("acceso_premium")
+  fechaPublicacion DateTime?   @map("fecha_publicacion")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
 
-  capitulo             Capitulo    @relation(fields: [capituloId], references: [id], onDelete: Cascade)
-  autor                Miembro     @relation("PiezasAutor", fields: [autorId], references: [id])
-  territorio           Territorio? @relation(fields: [territorioId], references: [id])
-  senialesReferenciadas Senial[]   @relation("PiezaSenalesReferenciadas")
+  capitulo              Capitulo    @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+  autor                 Miembro     @relation("PiezasAutor", fields: [autorId], references: [id])
+  territorio            Territorio? @relation(fields: [territorioId], references: [id])
+  senialesReferenciadas Senial[]    @relation("PiezaSenalesReferenciadas")
 
   @@index([capituloId])
   @@index([tipo])
@@ -414,19 +424,19 @@ model PiezaEditorial {
 /// Se distingue de Sponsor: el aliado fundador tiene dignidad institucional,
 /// no patrocinio comercial (lineamientos §3).
 model AliadoFundador {
-  id                String     @id @default(uuid()) @db.Uuid
-  capituloId        String     @map("capitulo_id") @db.Uuid
-  nombre            String
-  logo              String?
-  descripcionCorta  String?    @map("descripcion_corta")
-  tipo              TipoAliado
-  rolEspecifico     RolAliado  @map("rol_especifico")
-  link              String?
-  fechaIncorporacion DateTime  @default(now()) @map("fecha_incorporacion")
-  createdAt         DateTime   @default(now()) @map("created_at")
-  updatedAt         DateTime   @updatedAt @map("updated_at")
+  id                 String     @id @default(uuid()) @db.Uuid
+  capituloId         String     @map("capitulo_id") @db.Uuid
+  nombre             String
+  logo               String?
+  descripcionCorta   String?    @map("descripcion_corta")
+  tipo               TipoAliado
+  rolEspecifico      RolAliado  @map("rol_especifico")
+  link               String?
+  fechaIncorporacion DateTime   @default(now()) @map("fecha_incorporacion")
+  createdAt          DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime   @updatedAt @map("updated_at")
 
-  capitulo      Capitulo  @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+  capitulo       Capitulo  @relation(fields: [capituloId], references: [id], onDelete: Cascade)
   representantes Miembro[] @relation("MiembroAliado")
 
   @@index([capituloId])
@@ -441,15 +451,15 @@ model AliadoFundador {
 /// No usa claves foráneas porque referencia entidades heterogéneas; la
 /// integridad referencial se valida en la capa de aplicación (server actions).
 model Conexion {
-  id                String       @id @default(uuid()) @db.Uuid
-  capituloId        String       @map("capitulo_id") @db.Uuid
-  entidadOrigenTipo EntidadTipo  @map("entidad_origen_tipo")
-  entidadOrigenId   String       @map("entidad_origen_id") @db.Uuid
-  entidadDestinoTipo EntidadTipo @map("entidad_destino_tipo")
-  entidadDestinoId  String       @map("entidad_destino_id") @db.Uuid
-  tipoRelacion      TipoRelacion @map("tipo_relacion")
-  nota              String?
-  createdAt         DateTime     @default(now()) @map("created_at")
+  id                 String       @id @default(uuid()) @db.Uuid
+  capituloId         String       @map("capitulo_id") @db.Uuid
+  entidadOrigenTipo  EntidadTipo  @map("entidad_origen_tipo")
+  entidadOrigenId    String       @map("entidad_origen_id") @db.Uuid
+  entidadDestinoTipo EntidadTipo  @map("entidad_destino_tipo")
+  entidadDestinoId   String       @map("entidad_destino_id") @db.Uuid
+  tipoRelacion       TipoRelacion @map("tipo_relacion")
+  nota               String?
+  createdAt          DateTime     @default(now()) @map("created_at")
 
   @@index([entidadOrigenTipo, entidadOrigenId])
   @@index([entidadDestinoTipo, entidadDestinoId])
@@ -467,7 +477,7 @@ model Plan {
   nombre      String
   descripcion String?
   precioMxn   Decimal? @map("precio_mxn") @db.Decimal(10, 2)
-  intervalo   String?  // ej. "mensual", "trimestral", "unico"
+  intervalo   String? // ej. "mensual", "trimestral", "unico"
   activo      Boolean  @default(false)
   createdAt   DateTime @default(now()) @map("created_at")
 
@@ -496,14 +506,14 @@ model Suscripcion {
 /// Patrocinador comercial de pieza o evento específico (Horizonte 3).
 /// Dormida y deliberadamente separada de AliadoFundador desde el día uno.
 model Sponsor {
-  id          String   @id @default(uuid()) @db.Uuid
-  capituloId  String   @map("capitulo_id") @db.Uuid
-  nombre      String
-  logo        String?
-  link        String?
-  tipo        String?
-  activo      Boolean  @default(false)
-  createdAt   DateTime @default(now()) @map("created_at")
+  id         String   @id @default(uuid()) @db.Uuid
+  capituloId String   @map("capitulo_id") @db.Uuid
+  nombre     String
+  logo       String?
+  link       String?
+  tipo       String?
+  activo     Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
 
   capitulo Capitulo @relation(fields: [capituloId], references: [id], onDelete: Cascade)
 

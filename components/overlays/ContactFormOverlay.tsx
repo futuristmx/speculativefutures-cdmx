@@ -14,11 +14,31 @@ export function ContactFormOverlay({ open, onClose }: ContactFormOverlayProps) {
 
   return (
     <Overlay onClose={onClose} width={480}>
-      <div style={{ marginBottom: 18 }}><WIsotype size={42} /></div>
-      <h3 style={{ fontFamily: FONT, fontWeight: 700, fontSize: 24, color: C.CAL, margin: '0 0 8px', letterSpacing: '-.01em' }}>
+      <div style={{ marginBottom: 18 }}>
+        <WIsotype size={42} />
+      </div>
+      <h3
+        style={{
+          fontFamily: FONT,
+          fontWeight: 700,
+          fontSize: 24,
+          color: C.CAL,
+          margin: '0 0 8px',
+          letterSpacing: '-.01em',
+        }}
+      >
         Más información
       </h3>
-      <p style={{ fontFamily: FONT, fontWeight: 500, fontSize: 15, lineHeight: 1.55, color: C.BODY, margin: '0 0 24px' }}>
+      <p
+        style={{
+          fontFamily: FONT,
+          fontWeight: 500,
+          fontSize: 15,
+          lineHeight: 1.55,
+          color: C.BODY,
+          margin: '0 0 24px',
+        }}
+      >
         Cuéntanos quién eres y qué te interesa. Te respondemos pronto.
       </p>
       <ContactForm compact />

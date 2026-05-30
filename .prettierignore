@@ -1,0 +1,9 @@
+.next
+node_modules
+styles/tokens.css
+public/fonts
+package-lock.json
+prisma/migrations
+
+# Registro histórico y entregables del chat estratégico: no reformatear
+docs/

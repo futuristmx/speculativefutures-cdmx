@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "eventos": "Eventos",
+    "territorios": "Territorios",
+    "manifiesto": "Manifiesto",
+    "contacto": "Contacto",
+    "comunidad": "Comunidad",
+    "unete": "Únete",
+    "dashboard": "Mi panel",
+    "salir": "Salir"
+  },
+  "auth": {
+    "loginTitulo": "Entra a la comunidad",
+    "loginDescripcion": "Te enviamos un enlace mágico a tu correo. Sin contraseñas.",
+    "emailLabel": "Correo",
+    "emailPlaceholder": "tu@correo.com",
+    "enviarEnlace": "Enviar enlace de acceso",
+    "enviando": "Enviando…",
+    "enlaceEnviado": "Revisa tu correo",
+    "enlaceEnviadoDescripcion": "Te enviamos un enlace de acceso a {email}. Ábrelo desde este dispositivo.",
+    "error": "Hubo un error. Intenta de nuevo o escríbenos a speculativefuturescdmx@gmail.com",
+    "verificando": "Verificando tu acceso…"
+  },
+  "onboarding": {
+    "titulo": "Completa tu perfil",
+    "descripcion": "Cuéntanos quién eres para sumarte a la comunidad.",
+    "bienvenida": "Te damos la bienvenida a Speculative Futures CDMX.",
+    "continuar": "Continuar",
+    "proximamente": "El onboarding completo llega en el siguiente sprint."
+  },
+  "dashboard": {
+    "titulo": "Mi panel",
+    "bienvenida": "Bienvenida a la comunidad.",
+    "proximamente": "Tu panel se construye en los siguientes sprints."
+  },
+  "home": {
+    "bannerIngles": "Some content available in English",
+    "bannerInglesLink": "Ver contenido en inglés"
+  },
+  "errores": {
+    "generico": "Algo salió mal.",
+    "noEncontrado": "No encontramos esta página.",
+    "sinAcceso": "No tienes acceso a esta sección."
+  },
+  "comun": {
+    "cargando": "Cargando…",
+    "cerrar": "Cerrar",
+    "volver": "Volver"
+  }
+}

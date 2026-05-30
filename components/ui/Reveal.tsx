@@ -9,7 +9,13 @@ interface RevealProps {
   className?: string;
 }
 
-export function Reveal({ children, delay = 0, as = 'div', style, className }: RevealProps) {
+export function Reveal({
+  children,
+  delay = 0,
+  as = 'div',
+  style,
+  className,
+}: RevealProps) {
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -32,7 +38,10 @@ export function Reveal({ children, delay = 0, as = 'div', style, className }: Re
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
-          if (e.isIntersecting) { el.classList.add('in'); io.unobserve(el); }
+          if (e.isIntersecting) {
+            el.classList.add('in');
+            io.unobserve(el);
+          }
         });
       },
       { threshold: 0.08, rootMargin: '0px 0px -4% 0px' }
