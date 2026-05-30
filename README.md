@@ -92,12 +92,14 @@ npm run db:seed
 
 ### Curador Core inicial
 
-El seed precarga un Miembro con `rol_contribucion = curador_core` usando
-`SEED_CURADOR_CORE_EMAIL`. Ese registro nace sin `user_id`; cuando esa persona
-se registra con el mismo email vía magic link, el trigger `handle_new_user`
-**reconcilia** el `user_id` preservando el rol. Para promover otros curadores
-core después: actualizar `rol_contribucion` del Miembro (server action
-protegida por rol existente, o SQL de configuración en Supabase).
+El seed crea el Curador Core vía **Admin API de Supabase**: con
+`SEED_CURADOR_CORE_EMAIL` llama a `auth.admin.createUser` (lo que dispara el
+trigger `handle_new_user` y crea el Miembro con rol `regular`), y luego lo
+promueve a `curador_core` por `upsert` sobre `user_id`. Así `Miembro.user_id`
+es siempre obligatorio y todo Miembro corresponde a un `auth.users`. Para
+promover otros curadores core después: actualizar `rol_contribucion` del
+Miembro (server action protegida por rol existente, o SQL de configuración en
+Supabase). Requiere `SUPABASE_SERVICE_ROLE_KEY` en el entorno.
 
 ---
 

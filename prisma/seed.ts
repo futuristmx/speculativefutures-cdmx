@@ -1,22 +1,24 @@
-// Seed inicial del MDP. Idempotente (upsert por claves únicas).
+// Seed inicial del MDP. Idempotente.
 // Ejecutar: `npm run db:seed`.
 //
 // Inserta:
 //   - 1 capítulo: cdmx
 //   - 5 territorios (taxonomía fija)
 //   - 1 aliado fundador: Change · Futurist.mx
-//   - (O1) 1 Miembro curador_core, email vía SEED_CURADOR_CORE_EMAIL
-//
-// Nota (O1): este Miembro curador_core se inserta SIN user_id de auth.users
-// (queda null) porque el fundador aún no ha hecho login. Cuando el fundador
-// se registre con ese mismo email vía magic link, el trigger handle_new_user
-// no duplica (el reconcilio email→user_id se documenta en el README como
-// operación de configuración). El propósito del seed es garantizar que exista
-// al menos un curador_core para arrancar la curación.
+//   - (O1) 1 Curador Core: se crea su auth.users vía Admin API (lo que dispara
+//     el trigger handle_new_user y crea el Miembro con rol 'regular'), y luego
+//     se promueve a 'curador_core' por upsert sobre user_id.
 
 import { PrismaClient } from '@prisma/client';
+import { createClient } from '@supabase/supabase-js';
 
 const prisma = new PrismaClient();
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
 
 const TERRITORIOS = [
   { codigo: 'futuros', nombre: 'Futuros', orden: 1 },
@@ -64,28 +66,49 @@ async function main() {
     },
   });
 
-  // 4) (O1) Curador Core inicial
+  // 4) (O1) Curador Core inicial vía Admin API
   const email = process.env.SEED_CURADOR_CORE_EMAIL;
-  if (!email) {
-    console.warn(
-      '⚠ SEED_CURADOR_CORE_EMAIL no definida — se omite el curador core inicial.'
-    );
-  } else {
-    await prisma.miembro.upsert({
-      where: { capituloId_email: { capituloId: capitulo.id, email } },
-      update: { rolContribucion: 'curador_core' },
-      create: {
-        capituloId: capitulo.id,
-        nombre: 'Curador Core (fundador)',
-        email,
-        rolContribucion: 'curador_core',
-        onboardingCompletado: true,
-        aliadoFundadorId: aliado.id,
-        rolEnAliado: 'Fundador del capítulo',
-      },
+  if (!email) throw new Error('SEED_CURADOR_CORE_EMAIL no configurada');
+
+  // Crear (o reusar si ya existe) el usuario de auth. createUser dispara el
+  // trigger handle_new_user, que inserta el Miembro con rol 'regular'.
+  const { data: existingUsers, error: listError } =
+    await supabaseAdmin.auth.admin.listUsers();
+  if (listError) throw listError;
+
+  let userId = existingUsers.users.find((u) => u.email === email)?.id;
+
+  if (!userId) {
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      email_confirm: true,
     });
-    console.log(`✓ Curador core inicial: ${email}`);
+    if (error) throw error;
+    userId = data.user.id;
   }
+
+  // Promover/crear Miembro como curador_core. El upsert cubre ambos casos:
+  // el trigger ya creó el Miembro (normal) o no existe (defensa).
+  await prisma.miembro.upsert({
+    where: { userId },
+    update: {
+      rolContribucion: 'curador_core',
+      onboardingCompletado: true,
+      aliadoFundadorId: aliado.id,
+      rolEnAliado: 'Fundador del capítulo',
+    },
+    create: {
+      userId,
+      email,
+      capituloId: capitulo.id,
+      nombre: 'Curador Core (fundador)',
+      rolContribucion: 'curador_core',
+      onboardingCompletado: true,
+      aliadoFundadorId: aliado.id,
+      rolEnAliado: 'Fundador del capítulo',
+    },
+  });
+  console.log(`✓ Curador core inicial: ${email}`);
 
   console.log('Seed completado.');
 }
