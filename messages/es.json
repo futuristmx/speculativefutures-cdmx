@@ -23,15 +23,60 @@
   },
   "onboarding": {
     "titulo": "Completa tu perfil",
-    "descripcion": "Cuéntanos quién eres para sumarte a la comunidad.",
-    "bienvenida": "Te damos la bienvenida a Speculative Futures CDMX.",
-    "continuar": "Continuar",
-    "proximamente": "El onboarding completo llega en el siguiente sprint."
+    "descripcion": "Cuéntanos quién eres para sumarte a la comunidad. Toma menos de dos minutos.",
+    "completar": "Completar mi perfil",
+    "guardando": "Guardando…",
+    "bienvenida": "¡Bienvenida!"
   },
   "dashboard": {
-    "titulo": "Mi panel",
-    "bienvenida": "Bienvenida a la comunidad.",
-    "proximamente": "Tu panel se construye en los siguientes sprints."
+    "saludo": "Hola, {nombre}",
+    "editarPerfil": "Editar mi perfil",
+    "editarPerfilDesc": "Actualiza tus datos y avatar",
+    "explorarMiembros": "Explorar miembros",
+    "explorarMiembrosDesc": "Descubre a la comunidad",
+    "eventos": "Próximos eventos",
+    "eventosDesc": "Muy pronto",
+    "miembroDesde": "Miembro desde {fecha}"
+  },
+  "perfil": {
+    "tituloPropio": "Mi perfil",
+    "privado": "Privado",
+    "cambiarAvatar": "Cambiar avatar",
+    "subiendo": "Subiendo…",
+    "avatarHint": "JPG, PNG o WebP · máx. 2MB",
+    "avatarActualizado": "Avatar actualizado",
+    "perfilActualizado": "Perfil actualizado",
+    "guardarCambios": "Guardar cambios",
+    "volverMiembros": "Volver a miembros",
+    "representaA": "Representa a {aliado}",
+    "miembroDesde": "Miembro desde {fecha}",
+    "iniciaSesion": "Inicia sesión para ver perfiles de la comunidad"
+  },
+  "formulario": {
+    "nombre": "Nombre completo",
+    "nombrePlaceholder": "Tu nombre",
+    "disciplina": "Disciplina o rol profesional",
+    "disciplinaPlaceholder": "Ej. Diseñadora de futuros",
+    "territorios": "Territorios de interés",
+    "motivacion": "Motivación corta",
+    "motivacionPlaceholder": "¿Qué te trae a la comunidad? (1-2 oraciones)",
+    "bio": "Bio corta (opcional)",
+    "bioPlaceholder": "Algo más sobre ti",
+    "enlaces": "Enlaces externos (opcional, máx. 3)",
+    "anadirEnlace": "Añadir enlace",
+    "curadorCasilla": "Quiero contribuir como Curador Comunidad y publicar señales. Tus primeras 3 propuestas pasan por una revisión rápida."
+  },
+  "miembros": {
+    "titulo": "Miembros",
+    "conteo": "{total} construyendo futuros desde CDMX.",
+    "vacio": "Aún no hay miembros para mostrar.",
+    "anterior": "Anterior",
+    "siguiente": "Siguiente",
+    "pagina": "Página {pagina} de {total}"
+  },
+  "roles": {
+    "curador_comunidad": "Curador Comunidad",
+    "curador_core": "Curador Core"
   },
   "home": {
     "bannerIngles": "Some content available in English",
@@ -40,7 +85,8 @@
   "errores": {
     "generico": "Algo salió mal.",
     "noEncontrado": "No encontramos esta página.",
-    "sinAcceso": "No tienes acceso a esta sección."
+    "sinAcceso": "No tienes acceso a esta sección.",
+    "noGuardado": "No se pudo guardar"
   },
   "comun": {
     "cargando": "Cargando…",

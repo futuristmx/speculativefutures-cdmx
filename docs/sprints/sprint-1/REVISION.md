@@ -60,6 +60,8 @@ Dos caminos válidos:
 
 Recomendación: **B**, porque aplicar políticas hoy sobre buckets que no se usan introduce riesgo de configuración incorrecta sin posibilidad de validar. Mejor aplicarlas cuando se diseñe el flujo de subida de archivos.
 
+> **Nota retroactiva (transición a Sprint 2):** Criterio 10 del Sprint 1 cerrado retroactivamente en la transición a Sprint 2; **decisión definitiva A confirmada**. El Sprint 2 introduce upload de avatar (Storage ya en uso), por lo que las políticas de `06_storage.sql` se aplican ahora en lugar de postergarse. Esta es la única edición justificada de un documento de registro histórico, autorizada por el chat estratégico en la reconciliación de DESV-S2-2.
+
 ---
 
 ## OBSERVACIONES — Reglas persistentes a añadir al CLAUDE.md

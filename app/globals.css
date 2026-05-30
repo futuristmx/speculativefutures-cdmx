@@ -3,6 +3,10 @@
    "Señal en lo oscuro" · monochromatic green, dark-first.
    ============================================================================ */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: 'Gotham';
   font-style: normal;
