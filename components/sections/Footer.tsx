@@ -68,7 +68,7 @@ export function Footer({ onJoin, onComunidad, showGrid = true }: FooterProps) {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20, paddingTop: 28, borderTop: `1px solid ${C.PETROL7}` }}>
           <WLogo dark />
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(20px,4vw,40px)', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'clamp(20px,4vw,40px)', flexWrap: 'wrap' }}>
             <InstagramLink size={20} label />
             <div style={{ textAlign: 'right' }}>
               <div style={{ ...meta, color: C.MINT }}>Señales entre el ruido</div>
