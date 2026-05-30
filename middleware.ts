@@ -24,8 +24,12 @@ function localeOf(pathname: string): string {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Excepciones: callback de auth y API no llevan prefijo de locale ni i18n.
-  if (pathname.startsWith('/auth') || pathname.startsWith('/api')) {
+  // Excepciones: callback de auth, API y endpoints sin locale (ej. .ics).
+  if (
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/api') ||
+    /^\/eventos\/[^/]+\/ical$/.test(pathname)
+  ) {
     return NextResponse.next();
   }
 

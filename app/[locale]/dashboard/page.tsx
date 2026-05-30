@@ -17,6 +17,8 @@ function mensajePorRol(rol: string, tieneAliado: boolean): string {
   return 'Explora la comunidad, asiste a eventos y, cuando quieras, conviértete en Curador Comunidad para publicar señales.';
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage({
   params,
 }: {
