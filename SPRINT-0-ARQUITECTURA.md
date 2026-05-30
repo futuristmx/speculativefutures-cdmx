@@ -78,7 +78,11 @@ Detalle operativo con criterios de "hecho" en la **Sección 9**.
 
 ## Sección 2 — Modelo de datos (Prisma)
 
-El esquema completo y **validado** (`prisma validate` pasa sin errores) vive en `prisma/schema.prisma`. Resumen de entidades:
+El esquema completo y **validado** vive en `prisma/schema.prisma`. Validación verificada con **Prisma 6.18** (`npx prisma@6 validate` → *"The schema is valid"*, exit 0).
+
+> **Versión de Prisma (decisión):** se fija **Prisma 6.x** para el MDP. Prisma 7 (lanzado recientemente) introdujo un cambio incompatible: `url`/`directUrl` salen del bloque `datasource` del schema y pasan a `prisma.config.ts`. La combinación Supabase + Prisma 6 con `datasource { url, directUrl }` es la documentada y estable hoy. La migración a Prisma 7 se registra como decisión DIFERIBLE (Sección 13).
+
+Resumen de entidades:
 
 | Entidad | Propósito | Notas clave |
 |---|---|---|
@@ -600,12 +604,13 @@ Estas tareas se ejecutan como bloque de limpieza dentro del Sprint 1 (no como sp
 9. **Estructura fina de `ponentes` (JSON) y `recursos_post_evento` (JSON).** Forma del JSON se fija en Sprint 3/5.
 10. **Política de Storage para `dossiers/`.** Lectura restringida preparada para premium; reglas finas se definen cuando se active Horizonte 2.
 11. **Re-vestido de primitivas shadcn/ui.** Qué componentes se adoptan se decide por feature, no globalmente.
+12. **Migración a Prisma 7.** El MDP se fija en Prisma 6.x (datasource con `url`/`directUrl` en el schema, validado). Prisma 7 mueve esas URLs a `prisma.config.ts` y cambia la construcción del cliente. **Recomendación:** permanecer en Prisma 6.x durante el MDP; evaluar Prisma 7 post-MDP cuando el ecosistema Supabase lo documente plenamente. Migración acotada (mover URLs a config + ajustar instanciación), sin impacto en el modelo de datos.
 
 ---
 
 ## Cierre
 
-Este documento y `prisma/schema.prisma` constituyen el entregable del Sprint 0 incremental. El schema está validado (`prisma validate` sin errores). No se escribió código de producto, no se instalaron dependencias, no se ejecutaron migraciones ni se configuraron servicios externos.
+Este documento y `prisma/schema.prisma` constituyen el entregable del Sprint 0 incremental. El schema está validado con Prisma 6.18 (`prisma validate` sin errores, exit 0). No se escribió código de producto, no se instalaron dependencias (la validación se ejecutó vía `npx`, sin modificar `package.json`), no se ejecutaron migraciones ni se configuraron servicios externos.
 
 Conforme al proceso definido en los lineamientos (Parte III), este entregable regresa al chat estratégico para revisión arquitectónica. **Ningún sprint de construcción inicia sin aprobación explícita.**
 

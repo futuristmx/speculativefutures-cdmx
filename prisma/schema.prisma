@@ -2,6 +2,8 @@
 // Change Consulting · Mayo 2026
 //
 // Base de datos: Supabase PostgreSQL (plan Pro).
+// Requiere Prisma 6.x (datasource con url/directUrl en el schema). Validado con
+// Prisma 6.18. Prisma 7 movió estas URLs a prisma.config.ts — ver Sección 13.
 // Supabase Auth gestiona el esquema auth.users; la tabla Miembro lo extiende
 // con datos de aplicación, vinculada por user_id (UUID de Supabase Auth).
 //
