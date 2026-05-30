@@ -105,12 +105,12 @@ Verificación local en verde: **typecheck ✓ · lint ✓ · build ✓ · format
 | 17 | Cambiar a curador_core desde UI falla | **Implementado** (no se ofrece ni se acepta) |
 | 18 | `obtenerPermisos` une core + aliado | **Implementado** (helper + JSDoc) |
 | 19 | shadcn/ui con identidad del proyecto, no defaults | **Implementado** |
-| 20 | CI verde en PR | **Pendiente de verificación** — corre al abrir el PR |
-| 21 | Preview deployment con flujo end-to-end | **Pendiente de verificación** — Vercel genera el preview al abrir el PR |
+| 20 | CI verde en PR | **✅ CUMPLIDO** — PR #2, run SUCCESS (prisma validate, generate, tokens, lint, typecheck, format) |
+| 21 | Preview deployment con flujo end-to-end | **✅ CUMPLIDO** — preview Vercel en estado `success` (ver PR #2). El upload de avatar end-to-end depende del cierre de T3 (bucket + RLS) |
 
-**Verificados localmente con build/tsc/lint/format:** 1–19. **Pendientes de
-verificación en CI/preview (criterios 20-21):** se confirman al abrir el PR y
-revisar el preview, como en Sprint 1.
+**Verificados localmente (build/tsc/lint/format):** 1–19. **Verificados en
+CI/preview:** 20-21. El único punto end-to-end supeditado a config de dashboard
+es el upload de avatar (cierre de T3, decisión A).
 
 ---
 
@@ -129,41 +129,51 @@ revisar el preview, como en Sprint 1.
 
 ---
 
-## Desviaciones / conflictos señalados (no resueltos unilateralmente)
+## Desviaciones / conflictos — RECONCILIADOS por el chat estratégico
 
-### DESV-S2-1 — Identidad visual: el PROMPT menciona otra tipografía
-El PROMPT (Bloque 1) pide "tipografía Plus Jakarta Sans" y "border-radius
-cuadrado del sistema El Capitán". Eso **contradice** la identidad real de
-SF CDMX, que es **Gotham** (auto-hospedada desde Sprint 0) con radios 2/4px.
-Por la regla "prevalece LINEAMIENTOS / identidad establecida", se mantuvo
-**Gotham + tokens del proyecto**. Se asume texto residual de otro proyecto en
-el prompt. **Requiere confirmación del chat estratégico** (no bloquea).
+### DESV-S2-1 — Identidad visual: CONFIRMADA
+El PROMPT (Bloque 1) mencionaba "Plus Jakarta Sans" y "sistema El Capitán sin
+border-radius". El chat estratégico **confirmó como definitiva** la decisión de
+mantener **Gotham + tokens SF CDMX + radios 2/4px**. Sin cambio en código (ya
+estaba correcto). Acción de limpieza: eliminar referencias residuales en
+documentos versionados — la única en un documento de trabajo está en este
+ENTREGABLE (corregida en esta sección). La mención en
+`docs/sprints/sprint-2/PROMPT.md` se conserva verbatim por ser registro
+histórico (no editable; ver CLAUDE.md).
 
-### DESV-S2-2 — T3 (Storage RLS): contradicción entre documentos
-El PROMPT del Sprint 2 (línea 261) dice "T3 — decisión A confirmada", pero la
-REVISION del Sprint 1 recomendó **B** y el equipo confirmó **B** en la
-transición. Se mantiene **B**: el SQL de Storage (`06_storage.sql`) queda
-versionado y se aplicará en el sprint que use archivos. El upload de avatar de
-este sprint funciona porque la RLS de `avatars/` se aplicará junto con ese
-flujo; **mientras tanto, en preview/prod el bucket `avatars` debe existir y
-tener su policy** (ver "Pendiente operativo"). **Requiere reconciliación del
-chat estratégico** entre sus dos documentos.
+### DESV-S2-2 — T3 Storage RLS: DECISIÓN DEFINITIVA = A
+El chat estratégico **resolvió A** (aplicar las políticas de Storage ahora):
+el Sprint 2 introduce upload de avatar, Storage ya está en uso, no hay dónde
+postergar. Pasos de cierre en "Pendiente operativo / cierre T3". El SQL vive en
+`supabase/policies/06_storage.sql` (4 buckets). Esto reemplaza la decisión B
+provisional registrada durante la transición.
 
 ---
 
-## Pendiente operativo (config externa, equipo Change)
+## Cierre de T3 (decisión A) — operación de dashboard
 
-- **Bucket `avatars` + su RLS:** para que el upload de avatar funcione en
-  preview/producción, aplicar la parte de `avatars` de
-  `supabase/policies/06_storage.sql` desde el panel Storage del dashboard
-  (crear bucket público `avatars` + políticas de lectura pública / escritura
-  por dueño). Es el primer flujo que usa Storage, así que aquí es donde la
-  decisión B "se activa" para este bucket.
-- **T1 baseline migraciones:** `prisma/migrations/0_init/migration.sql` ya está
-  generado y versionado. Ejecutar desde máquina con acceso directo:
-  `npx prisma migrate resolve --applied 0_init` (ver README → "Setup inicial
-  de migraciones").
-- **Criterios 20-21:** se cierran al abrir el PR (CI) y revisar el preview.
+1. Crear el bucket `avatars` en Supabase Dashboard → Storage (si no existe).
+2. Aplicar las políticas de `supabase/policies/06_storage.sql` desde el panel
+   Storage → Policies para los 4 buckets (avatars, eventos, aliados, dossiers).
+   Para `avatars` como mínimo: lectura pública + escritura solo por el dueño
+   (path basado en `user_id`).
+3. Verificar end-to-end: subir un avatar desde `/perfil/yo` en el preview
+   deployment; confirmar que la imagen se almacena y se muestra.
+4. Si la verificación pasa: marcar este punto cerrado aquí y añadir nota en
+   `docs/sprints/sprint-1/REVISION.md` (único caso justificado de editar
+   registro histórico) — ya aplicada: "Criterio 10 del Sprint 1 cerrado
+   retroactivamente en la transición a Sprint 2; decisión definitiva A".
+
+**Estado:** SQL y código listos; pasos 1-3 son operación de dashboard del
+equipo Change (el sandbox no alcanza Storage). El paso 4 (nota en REVISION.md)
+ya quedó aplicado en este commit.
+
+## Otros pendientes operativos
+
+- **T1 baseline migraciones:** `prisma/migrations/0_init/migration.sql`
+  versionado. Ejecutar desde máquina con acceso directo:
+  `npx prisma migrate resolve --applied 0_init` (README → "Setup inicial de
+  migraciones").
 
 ---
 
