@@ -128,7 +128,7 @@ y marcada como pendiente de credenciales.
 | 7 | Middleware redirige a `/login` anónimo en ruta privada | **Implementado y compilado** |
 | 8 | Seed crea capítulo, 5 territorios, aliado, curador core | **✅ CUMPLIDO — verificado en DB viva.** 1 capítulo cdmx, 5 territorios, 1 aliado Change, y `andres@change.live` promovido a `curador_core` con `onboarding_completado = true` y vínculo al aliado |
 | 9 | RLS senial: anónimo solo ve publicadas; core ve borradores | **CUMPLIDO (políticas activas en DB)** — RLS habilitada y políticas creadas; falta prueba de acceso diferenciado anon vs core con cliente real |
-| 10 | RLS Storage: avatars lectura pública; dossiers rechaza anónimo | **Pendiente** — el SQL de Storage requiere rol owner que el SQL Editor no tiene (`must be owner of table objects`). Se aplica desde el panel de Storage / con privilegios elevados. Ver DESV-4 |
+| 10 | RLS Storage: avatars lectura pública; dossiers rechaza anónimo | **Postergado formalmente (decisión T3 = B del chat estratégico).** El SQL (`supabase/policies/06_storage.sql`) queda versionado y se aplicará en el sprint que use Storage (eventos con imágenes / dossiers). Aplicar políticas hoy sobre buckets sin uso no es validable. Ver DESV-4 |
 | 11 | `/es` y `/en` resuelven; banner inglés | **Implementado y compilado.** Build genera ambas rutas; `messages/en.json` completado con todas las claves (auth/onboarding/dashboard) — ya sin `MISSING_MESSAGE`. Banner: string i18n presente; render en home se conecta en sprint de UI |
 | 12 | Huérfanos eliminados | **Cumplido** |
 | 13 | `TweaksWidget` fuera del bundle de producción | **Cumplido** (movido a dev + guard de entorno) |
