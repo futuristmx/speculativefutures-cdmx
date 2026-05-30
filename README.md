@@ -127,6 +127,32 @@ Tras esto, las migraciones siguientes funcionan con
 
 ---
 
+## Setup de Storage (buckets + RLS)
+
+Las políticas de Storage viven en `supabase/policies/06_storage.sql`. No se
+aplican desde el sandbox (requiere rol owner sobre `storage.objects`); son
+operación de dashboard del equipo Change. Decisión definitiva: **A** — se
+aplican cuando un flujo usa Storage (el primero es el avatar, Sprint 2).
+
+Pasos (Supabase Dashboard):
+
+1. **Crear buckets** en Storage si no existen: `avatars` (público), `eventos`
+   (público), `aliados` (público), `dossiers` (privado).
+2. **Aplicar políticas** desde Storage → Policies según
+   `supabase/policies/06_storage.sql`. Para `avatars`: lectura pública +
+   escritura/actualización/borrado solo por el dueño, identificado con la
+   primera carpeta del path = `auth.uid()` (los avatares se guardan en
+   `avatars/{user_id}/avatar.webp`).
+3. **Verificar end-to-end** en el preview deployment: login → `/perfil/yo` →
+   subir avatar → confirmar que se almacena en `avatars/{user_id}/avatar.webp`,
+   que el URL se persiste en `Miembro.foto`, y que se muestra en `/perfil/yo`,
+   en `/perfil/[id]` desde otra cuenta y en `MiembroCard` del listado.
+
+Tras la verificación, marcar criterios 8 y 9 del Sprint 2 como cumplidos
+end-to-end en `docs/sprints/sprint-2/ENTREGABLE.md`.
+
+---
+
 ## Preview deployments
 
 Cada PR genera un preview en Vercel con su propia rama de Supabase

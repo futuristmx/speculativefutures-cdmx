@@ -177,13 +177,34 @@ ya quedó aplicado en este commit.
 
 ---
 
+## Revisión del Sprint 2 — veredicto y observaciones
+
+**Veredicto:** APROBADO CON OBSERVACIONES (ver `REVISION.md`). Sprint 3
+autorizado. Observaciones integradas al seguimiento:
+
+- **TT-S2-1 — cierre de T3 + verificación del avatar:** decisión A. Pasos
+  documentados en README → "Setup de Storage". Operación de dashboard del
+  equipo Change; al verificar end-to-end, los criterios 8 y 9 pasan a cumplidos
+  en runtime. **Pendiente del equipo.**
+- **TT-S2-2 — verificación end-to-end (checklist de 10 puntos):** la ejecuta el
+  equipo Change en el preview; los defectos, si los hay, entran como
+  pre-requisito al Sprint 3. **Pendiente del equipo.**
+- **TT-S2-3 — PROMPT residual del Sprint 2:** decisión A, se deja sin editar
+  (fidelidad del registro histórico). El ENTREGABLE es la capa de corrección.
+- **O15 — toast tras `revalidatePath`+`redirect`:** se verifica en Sprint 3 al
+  introducir flujos de eventos con feedback similar. Anotado.
+- **O16 — UI de paginación >20 miembros:** ya implementada en `miembros/page`
+  (botones Anterior/Siguiente + "Página X de Y"). Sin acción adicional.
+- **O17 — documentar `colorDeId`:** ✅ aplicado — JSDoc con algoritmo, tamaño de
+  paleta y nota de distribución en `lib/avatar.ts`.
+
 ## Siguiente paso
 
-1. `ENTREGABLE.md` versionado (este documento).
-2. PR de `feat/sprint-2-miembros` para revisión.
-3. Verificar CI verde + preview con flujo end-to-end.
-4. Documento regresa al chat estratégico para `REVISION.md` del Sprint 2.
-5. **Sprint 3 no inicia sin `REVISION.md` aprobada del Sprint 2.**
+1. `ENTREGABLE.md` y `REVISION.md` versionados.
+2. Mergear PR #2 → `main` (despliega a producción).
+3. Cerrar TT-S2-1 (Storage) y TT-S2-2 (checklist) en el preview.
+4. Ramificar `feat/sprint-3-eventos` y versionar el PROMPT del Sprint 3.
+5. **Sprint 3 ya autorizado por la REVISION; arranca tras el merge.**
 
 ---
 
