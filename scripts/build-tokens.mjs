@@ -13,8 +13,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const tokensPath = resolve(__dirname, '../styles/tokens.ts');
 const src = readFileSync(tokensPath, 'utf8');
 
-// 1) Recolecta constantes simples `nombre: '#valor'` dentro de los objetos
-//    `color`, `font`, etc., para resolver referencias tipo color.mint400.
+// Captura un literal entre comillas simples o dobles.
+const QUOTED = `(?:'([^']*)'|"([^"]*)")`;
+
+// 1) Recolecta constantes `nombre: 'valor'` o `nombre: "valor"` dentro de los
+//    objetos base, para resolver referencias tipo color.mint400 o font.sans.
 const consts = {};
 for (const block of [
   'color',
@@ -29,8 +32,8 @@ for (const block of [
   const m = src.match(re);
   if (!m) continue;
   for (const line of m[1].split('\n')) {
-    const mm = line.match(/^\s*([A-Za-z0-9_]+):\s*'([^']*)'/);
-    if (mm) consts[`${block}.${mm[1]}`] = mm[2];
+    const mm = line.match(new RegExp(`^\\s*([A-Za-z0-9_]+):\\s*${QUOTED}`));
+    if (mm) consts[`${block}.${mm[1]}`] = mm[2] ?? mm[3];
   }
 }
 
@@ -43,19 +46,27 @@ if (!mapMatch) {
 
 const entries = [];
 for (const line of mapMatch[1].split('\n')) {
-  // '--var': valor,   donde valor es 'literal' o referencia color.x / font.x
-  const m = line.match(/^\s*'([^']+)':\s*(.+?),?\s*$/);
+  // '--var': 'literal',  |  '--var': "literal",  |  '--var': color.x,
+  const m = line.match(
+    new RegExp(`^\\s*'([^']+)':\\s*(${QUOTED}|[A-Za-z0-9_.]+)\\s*,?\\s*$`)
+  );
   if (!m) continue;
   const key = m[1];
-  let raw = m[2].trim();
+  const rawQuotedSingle = m[3];
+  const rawQuotedDouble = m[4];
   let value;
-  if (raw.startsWith("'")) {
-    value = raw.slice(1, raw.lastIndexOf("'"));
-  } else if (consts[raw] !== undefined) {
-    value = consts[raw];
+  if (rawQuotedSingle !== undefined) {
+    value = rawQuotedSingle;
+  } else if (rawQuotedDouble !== undefined) {
+    value = rawQuotedDouble;
   } else {
-    console.error(`No se pudo resolver el valor de ${key}: ${raw}`);
-    process.exit(1);
+    const ref = m[2].trim();
+    if (consts[ref] !== undefined) {
+      value = consts[ref];
+    } else {
+      console.error(`No se pudo resolver el valor de ${key}: ${ref}`);
+      process.exit(1);
+    }
   }
   entries.push(`  ${key}: ${value};`);
 }
