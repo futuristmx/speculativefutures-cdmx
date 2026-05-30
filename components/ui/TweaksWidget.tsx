@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { C, FONT, meta } from '@/lib/tokens';
 import type { HeroVariant } from '@/components/sections/Hero';
 
-const HEADLINES = ['Ciudad de México', 'empieza a cambiar', 'conectamos'];
+const HEADLINES = ['Ciudad de México', 'empieza a cambiar', 'contradictorias'];
 
 interface TweaksWidgetProps {
   variant: HeroVariant;

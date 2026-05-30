@@ -8,7 +8,7 @@ import { C, FONT, meta, HAIR } from '@/lib/tokens';
 const HEADLINES = [
   ['Futuros posibles desde ', 'Ciudad de México', '.'],
   ['Hacemos visible lo que ', 'empieza a cambiar', '.'],
-  ['Leemos señales en lo oscuro y las ', 'conectamos', '.'],
+  ['Leemos señales débiles, emergentes y ', 'contradictorias', '.'],
 ];
 
 const SUB = 'Comunidad interdisciplinaria para imaginar, cuestionar y activar futuros: foresight, diseño especulativo, innovación, cultura, tecnología, ciudad y sociedad, en la misma conversación.';

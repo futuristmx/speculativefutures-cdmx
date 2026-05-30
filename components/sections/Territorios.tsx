@@ -3,7 +3,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { C, FONT, meta, HAIR } from '@/lib/tokens';
 
 const TERR_DEFS: [string, string][] = [
-  ['Futuros & Foresight', 'Métodos para anticipar, imaginar y disputar lo que viene.'],
+  ['Futuros', 'Métodos para anticipar, imaginar y disputar lo que viene.'],
   ['Innovación & Negocios', 'Modelos y economías que emergen cuando algo empieza a cambiar.'],
   ['Ciudad & Sistemas Vivos', 'Lo urbano leído como sistema que se adapta y se tensiona.'],
   ['Cultura & Sociedad', 'Cómo se mueven los imaginarios, los rituales y la pertenencia.'],

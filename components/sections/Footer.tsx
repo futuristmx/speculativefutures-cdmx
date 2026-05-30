@@ -68,7 +68,7 @@ export function Footer({ onJoin, onComunidad, showGrid = true }: FooterProps) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20, paddingTop: 28, borderTop: `1px solid ${C.PETROL7}` }}>
           <WLogo dark />
           <div style={{ textAlign: 'right' }}>
-            <div style={{ ...meta, color: C.MINT }}>Señal en lo oscuro</div>
+            <div style={{ ...meta, color: C.MINT }}>Señales entre el ruido</div>
             <div style={{ ...meta, marginTop: 6 }}>19.4326° N · 99.1332° W · EST. 2026</div>
           </div>
         </div>

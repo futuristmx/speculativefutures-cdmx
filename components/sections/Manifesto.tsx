@@ -5,7 +5,7 @@ import { C, FONT, HAIR } from '@/lib/tokens';
 const lines: [string, string, string][] = [
   ['La especulación responsable observa la realidad con profundidad, reconoce sus tensiones y explora posibilidades con ', 'consecuencias', '.'],
   ['Creemos en la imaginación como ', 'infraestructura', ': estratégica, cultural y cívica.'],
-  ['Los futuros se imaginan, se disputan, se diseñan y ', 'se practican', '.'],
+  ['Los futuros se imaginan, se problematizan, se diseñan y ', 'se practican', '.'],
 ];
 
 export function Manifesto({ showGrid = true }: { showGrid?: boolean }) {
