@@ -192,8 +192,38 @@ body {
 /* ============================================================================
    RESPONSIVE HELPERS
    ============================================================================ */
+
+/* Desktop nav visible by default; hamburger hidden */
+.nav-hamburger { display: none !important; }
+
+@media (max-width: 880px) {
+  /* Nav: swap desktop menu for hamburger */
+  .nav-desktop { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+}
+
 @media (max-width: 768px) {
+  /* Stack two-column grids */
   .hero-grid, .event-grid { grid-template-columns: 1fr !important; }
   .hero-graphic { display: none !important; }
-  .navlinks { display: none !important; }
+
+  /* Territorios rows: number + title on top, description below */
+  .terr-row {
+    grid-template-columns: 40px 1fr !important;
+    row-gap: 8px !important;
+  }
+  .terr-row > p {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* Manifesto / large headings breathe a bit less */
+  body { -webkit-text-size-adjust: 100%; }
+
+  /* Tweaks widget: smaller + bottom-left so it doesn't cover CTAs */
+  .tweaks-panel { width: calc(100vw - 32px) !important; max-width: 300px; }
+}
+
+/* Prevent horizontal overflow on small screens */
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; }
 }

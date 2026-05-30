@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { C, FONT, meta } from '@/lib/tokens';
 import type { HeroVariant } from '@/components/sections/Hero';
 
@@ -103,6 +103,13 @@ export function TweaksWidget({
 }: TweaksWidgetProps) {
   const [visible, setVisible] = useState(true);
 
+  // Collapse by default on small screens so it never covers content
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setVisible(false);
+    }
+  }, []);
+
   return (
     <>
       {/* collapsed pill */}
@@ -146,12 +153,15 @@ export function TweaksWidget({
       {/* panel */}
       {visible && (
         <div
+          className="tweaks-panel"
           style={{
             position: 'fixed',
             bottom: 24,
             right: 24,
             zIndex: 50,
             width: 240,
+            maxHeight: 'calc(100vh - 48px)',
+            overflowY: 'auto',
             background: 'rgba(11,51,49,.96)',
             border: `1px solid ${C.PETROL7}`,
             borderRadius: 10,
