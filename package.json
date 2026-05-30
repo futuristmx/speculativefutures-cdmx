@@ -11,8 +11,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "tokens:build": "node --experimental-strip-types scripts/build-tokens.mjs",
-    "db:apply-policies": "node --experimental-strip-types scripts/apply-policies.mjs",
+    "tokens:build": "node scripts/build-tokens.mjs",
+    "db:apply-policies": "node scripts/apply-policies.mjs",
     "db:setup": "prisma migrate deploy && npm run db:apply-policies",
     "db:seed": "node --experimental-strip-types prisma/seed.ts"
   },
