@@ -26,3 +26,4 @@ INVENTARIO_TECNICO.md
 # SQL ensamblado para setup manual en Supabase (artefacto de entrega; la
 # fuente real vive en prisma/schema.prisma y supabase/policies/)
 SUPABASE_SETUP.sql
+VERIFICAR.sql
