@@ -1,0 +1,496 @@
+// Speculative Futures CDMX — Esquema de datos
+// Change Consulting · Mayo 2026
+//
+// Base de datos: Supabase PostgreSQL (plan Pro).
+// Supabase Auth gestiona el esquema auth.users; la tabla Miembro lo extiende
+// con datos de aplicación, vinculada por user_id (UUID de Supabase Auth).
+//
+// Convenciones:
+//   - Modelos en PascalCase; columnas y tablas en snake_case vía @map/@@map.
+//   - capitulo_id presente en todas las entidades centrales (preparación
+//     multi-capítulo sin refactor; valor único 'cdmx' durante el MDP).
+//   - Las entidades de monetización (Plan, Suscripcion, Sponsor) se declaran
+//     dormidas: existen en el esquema pero ningún flujo del MDP las escribe.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")  // conexión vía pgbouncer (pooled)
+  directUrl = env("DIRECT_URL")    // conexión directa para migraciones
+}
+
+// ===========================================================================
+// ENUMS
+// ===========================================================================
+
+/// Nivel de contribución de un miembro al corpus de señales (Modelo 1.5).
+enum RolContribucion {
+  regular
+  curador_comunidad
+  curador_core
+}
+
+/// Estado de actividad de la cuenta de un miembro.
+enum EstadoMiembro {
+  activo
+  inactivo
+}
+
+/// Taxonomía de tipos de señal (foresight).
+enum TipoSenial {
+  tendencia
+  anomalia
+  contradiccion
+  hack
+  extremo
+  debilidad
+}
+
+/// Ciclo de vida de una señal.
+enum EstadoSenial {
+  borrador
+  en_revision
+  aprobada
+  rechazada
+  publicada
+}
+
+/// Horizonte temporal de una señal.
+/// NOTA: los lineamientos nombran el campo pero no fijan su dominio de valores.
+/// Estos valores son provisionales (ver Sección 13, decisión DIFERIBLE).
+enum HorizonteTemporal {
+  corto_plazo
+  mediano_plazo
+  largo_plazo
+}
+
+/// Decisión emitida por un Curador Core sobre una propuesta de señal.
+enum DecisionRevision {
+  aprobada
+  rechazada
+  comentario
+}
+
+/// Modalidad de un evento.
+enum ModalidadEvento {
+  online
+  presencial
+  hibrido
+}
+
+/// Ciclo de vida de un evento.
+/// NOTA: los lineamientos no fijan el dominio; se infiere de la acción
+/// "cancelar evento" (prompt §6). Ver Sección 13.
+enum EstadoEvento {
+  borrador
+  publicado
+  cancelado
+  finalizado
+}
+
+/// Estado de la asistencia de un miembro a un evento.
+enum EstadoRSVP {
+  registrado
+  asistio
+  no_asistio
+}
+
+/// Tipo de pieza editorial.
+enum TipoPieza {
+  ensayo
+  dossier
+  reporte
+  briefing
+}
+
+/// Ciclo de vida de una pieza editorial.
+enum EstadoPieza {
+  borrador
+  publicada
+}
+
+/// Naturaleza institucional de un aliado fundador.
+enum TipoAliado {
+  academia
+  cultural
+  consultora
+  fundacion
+}
+
+/// Rol específico de un aliado fundador dentro del capítulo.
+enum RolAliado {
+  editorial
+  eventos
+  financiero
+  intelectual
+}
+
+/// Tipo de relación entre dos entidades (entidad Conexion).
+enum TipoRelacion {
+  convergencia
+  contradiccion
+  derivacion
+  referencia
+}
+
+/// Tipo de entidad referenciable por una Conexion (polimórfica).
+enum EntidadTipo {
+  senial
+  evento
+  pieza_editorial
+}
+
+/// Estado de una suscripción (entidad dormida — Horizonte 2).
+enum EstadoSuscripcion {
+  activa
+  pausada
+  cancelada
+}
+
+// ===========================================================================
+// NÚCLEO MULTI-CAPÍTULO
+// ===========================================================================
+
+/// Capítulo de la red Speculative Futures. Durante el MDP existe un único
+/// registro ('cdmx'); el modelo está listo para sumar capítulos sin migración.
+model Capitulo {
+  id           String   @id @default(uuid()) @db.Uuid
+  codigo       String   @unique // identificador legible, ej. "cdmx"
+  nombre       String
+  descripcion  String?
+  ciudad       String?
+  pais         String?  @default("México")
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  miembros     Miembro[]
+  territorios  Territorio[]
+  seniales     Senial[]
+  eventos      Evento[]
+  piezas       PiezaEditorial[]
+  aliados      AliadoFundador[]
+  sponsors     Sponsor[]
+
+  @@map("capitulo")
+}
+
+// ===========================================================================
+// MIEMBROS Y TAXONOMÍA
+// ===========================================================================
+
+/// Persona registrada. Extiende auth.users de Supabase (vínculo por user_id).
+/// El registro de Miembro se crea por trigger en la base al insertarse el
+/// auth.users correspondiente (ver Sección 5 del documento de arquitectura).
+model Miembro {
+  id                          String          @id @default(uuid()) @db.Uuid
+  userId                      String          @unique @map("user_id") @db.Uuid // = auth.users.id
+  capituloId                  String          @map("capitulo_id") @db.Uuid
+  nombre                      String
+  email                       String
+  foto                        String?
+  disciplina                  String?
+  motivacion                  String?
+  bioCorta                    String?         @map("bio_corta")
+  enlacesExternos             Json?           @map("enlaces_externos")
+  rolContribucion             RolContribucion @default(regular) @map("rol_contribucion")
+  /// Contador de señales aprobadas; gobierna la calibración de entrada.
+  /// Si rolContribucion = curador_comunidad y este valor < 3 → cola de revisión.
+  /// Si >= 3 → publicación directa con auditoría post-hoc (auditada = false).
+  senialesPublicadasAprobadas Int             @default(0) @map("seniales_publicadas_aprobadas")
+  estado                      EstadoMiembro   @default(activo)
+  /// Vínculo opcional con un aliado fundador al que el miembro representa;
+  /// otorga el rol de permisos "aliado_fundador" (ver Sección 6).
+  aliadoFundadorId            String?         @map("aliado_fundador_id") @db.Uuid
+  fechaRegistro               DateTime        @default(now()) @map("fecha_registro")
+  updatedAt                   DateTime        @updatedAt @map("updated_at")
+
+  capitulo             Capitulo         @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+  aliadoFundador       AliadoFundador?  @relation("MiembroAliado", fields: [aliadoFundadorId], references: [id], onDelete: SetNull)
+  territoriosInteres   Territorio[]     @relation("MiembroTerritorios")
+  senialesCuradas      Senial[]         @relation("SenialesCuradas")
+  revisionesRealizadas RevisionSenial[] @relation("RevisionesRealizadas")
+  rsvps                RSVP[]
+  piezas               PiezaEditorial[] @relation("PiezasAutor")
+  suscripciones        Suscripcion[]
+
+  @@unique([capituloId, email]) // email único por capítulo
+  @@index([rolContribucion])
+  @@index([capituloId])
+  @@map("miembro")
+}
+
+/// Taxonomía fija de cinco territorios. No editable por miembros; se siembra
+/// en migración inicial y solo Curador Core la altera a nivel arquitectura.
+model Territorio {
+  id          String   @id @default(uuid()) @db.Uuid
+  capituloId  String   @map("capitulo_id") @db.Uuid
+  codigo      String   // ej. "futuros", "ciudad_sistemas_vivos"
+  nombre      String
+  descripcion String?
+  orden       Int      @default(0)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  capitulo            Capitulo         @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+  miembrosInteresados Miembro[]        @relation("MiembroTerritorios")
+  seniales            Senial[]
+  eventos             Evento[]
+  piezas              PiezaEditorial[]
+
+  @@unique([capituloId, codigo])
+  @@map("territorio")
+}
+
+// ===========================================================================
+// SEÑALES (Modelo 1.5 con calibración)
+// ===========================================================================
+
+/// Unidad de inteligencia de futuros. Núcleo del repositorio del capítulo.
+model Senial {
+  id                      String             @id @default(uuid()) @db.Uuid
+  capituloId              String             @map("capitulo_id") @db.Uuid
+  titulo                  String
+  descripcion            String
+  fuenteUrl               String?            @map("fuente_url")
+  fuenteDescripcion       String?            @map("fuente_descripcion")
+  territorioId            String             @map("territorio_id") @db.Uuid
+  curadorId               String             @map("curador_id") @db.Uuid
+  tipo                    TipoSenial
+  horizonteTemporal       HorizonteTemporal? @map("horizonte_temporal")
+  interpretacionEstrategica String?          @map("interpretacion_estrategica")
+  estado                  EstadoSenial       @default(borrador)
+  /// Idiomas en que existe la señal. Default español; no se traduce
+  /// automáticamente (lineamientos §5).
+  idiomas                 String[]           @default(["es"])
+  /// false hasta que un Curador Core la audita post-publicación directa.
+  auditada                Boolean            @default(false)
+  fechaCaptura            DateTime           @default(now()) @map("fecha_captura")
+  fechaPublicacion        DateTime?          @map("fecha_publicacion")
+  createdAt               DateTime           @default(now()) @map("created_at")
+  updatedAt               DateTime           @updatedAt @map("updated_at")
+
+  capitulo   Capitulo         @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+  territorio Territorio       @relation(fields: [territorioId], references: [id])
+  curador    Miembro          @relation("SenialesCuradas", fields: [curadorId], references: [id])
+  revisiones RevisionSenial[]
+  eventos    Evento[]         @relation("EventoSenalesDiscutidas")
+  piezas     PiezaEditorial[] @relation("PiezaSenalesReferenciadas")
+
+  @@index([capituloId])
+  @@index([territorioId])
+  @@index([estado])
+  @@index([curadorId])
+  @@index([fechaPublicacion])
+  @@map("senial")
+}
+
+/// Registro de revisión editorial de una propuesta de señal (feedback +
+/// decisión del Curador Core). Soporta el dashboard de curación y la fase de
+/// calibración de los Curador Comunidad (lineamientos §2).
+model RevisionSenial {
+  id         String           @id @default(uuid()) @db.Uuid
+  senialId   String           @map("senial_id") @db.Uuid
+  revisorId  String           @map("revisor_id") @db.Uuid
+  decision   DecisionRevision
+  comentario String?
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  senial  Senial  @relation(fields: [senialId], references: [id], onDelete: Cascade)
+  revisor Miembro @relation("RevisionesRealizadas", fields: [revisorId], references: [id])
+
+  @@index([senialId])
+  @@map("revision_senial")
+}
+
+// ===========================================================================
+// EVENTOS Y RSVP
+// ===========================================================================
+
+/// Producción de la comunidad (sesión, charla, taller).
+model Evento {
+  id               String          @id @default(uuid()) @db.Uuid
+  capituloId       String          @map("capitulo_id") @db.Uuid
+  titulo           String
+  descripcion      String
+  territorioId     String?         @map("territorio_id") @db.Uuid
+  modalidad        ModalidadEvento
+  estado           EstadoEvento    @default(borrador)
+  fechaInicio      DateTime        @map("fecha_inicio")
+  fechaFin         DateTime?       @map("fecha_fin")
+  ubicacion        String?
+  capacidad        Int?
+  /// Idiomas del evento (default español; en+es si hay ponentes internacionales).
+  idiomas          String[]        @default(["es"])
+  /// Ponentes embebidos como JSON (nombre, bio, foto, enlace) — no requieren
+  /// ser miembros del sistema.
+  ponentes         Json?
+  recursosPostEvento Json?         @map("recursos_post_evento")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  capitulo          Capitulo    @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+  territorio        Territorio? @relation(fields: [territorioId], references: [id])
+  rsvps             RSVP[]
+  senalesDiscutidas Senial[]    @relation("EventoSenalesDiscutidas")
+
+  @@index([capituloId])
+  @@index([fechaInicio])
+  @@index([estado])
+  @@map("evento")
+}
+
+/// Inscripción de un miembro a un evento.
+model RSVP {
+  id            String     @id @default(uuid()) @db.Uuid
+  miembroId     String     @map("miembro_id") @db.Uuid
+  eventoId      String     @map("evento_id") @db.Uuid
+  estado        EstadoRSVP @default(registrado)
+  fechaRegistro DateTime   @default(now()) @map("fecha_registro")
+
+  miembro Miembro @relation(fields: [miembroId], references: [id], onDelete: Cascade)
+  evento  Evento  @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+
+  @@unique([miembroId, eventoId]) // un RSVP por miembro por evento
+  @@index([eventoId])
+  @@map("rsvp")
+}
+
+// ===========================================================================
+// PRODUCTO EDITORIAL
+// ===========================================================================
+
+/// Pieza editorial: ensayo, dossier, reporte o briefing.
+model PiezaEditorial {
+  id              String      @id @default(uuid()) @db.Uuid
+  capituloId      String      @map("capitulo_id") @db.Uuid
+  tipo            TipoPieza
+  titulo          String
+  contenido       String      @db.Text
+  autorId         String      @map("autor_id") @db.Uuid
+  territorioId    String?     @map("territorio_id") @db.Uuid
+  estado          EstadoPieza @default(borrador)
+  idiomas         String[]    @default(["es"])
+  /// Reservado para Horizonte 2 (monetización). Siempre false en el MDP.
+  accesoPremium   Boolean     @default(false) @map("acceso_premium")
+  fechaPublicacion DateTime?  @map("fecha_publicacion")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  capitulo             Capitulo    @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+  autor                Miembro     @relation("PiezasAutor", fields: [autorId], references: [id])
+  territorio           Territorio? @relation(fields: [territorioId], references: [id])
+  senialesReferenciadas Senial[]   @relation("PiezaSenalesReferenciadas")
+
+  @@index([capituloId])
+  @@index([tipo])
+  @@index([fechaPublicacion])
+  @@map("pieza_editorial")
+}
+
+// ===========================================================================
+// ALIADOS FUNDADORES
+// ===========================================================================
+
+/// Entidad institucional aliada del capítulo. Primer registro: Change · Futurist.mx.
+/// Se distingue de Sponsor: el aliado fundador tiene dignidad institucional,
+/// no patrocinio comercial (lineamientos §3).
+model AliadoFundador {
+  id                String     @id @default(uuid()) @db.Uuid
+  capituloId        String     @map("capitulo_id") @db.Uuid
+  nombre            String
+  logo              String?
+  descripcionCorta  String?    @map("descripcion_corta")
+  tipo              TipoAliado
+  rolEspecifico     RolAliado  @map("rol_especifico")
+  link              String?
+  fechaIncorporacion DateTime  @default(now()) @map("fecha_incorporacion")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+
+  capitulo      Capitulo  @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+  representantes Miembro[] @relation("MiembroAliado")
+
+  @@index([capituloId])
+  @@map("aliado_fundador")
+}
+
+// ===========================================================================
+// CONEXIONES (entidad transversal)
+// ===========================================================================
+
+/// Relación tipada y polimórfica entre dos entidades (señal, evento, pieza).
+/// No usa claves foráneas porque referencia entidades heterogéneas; la
+/// integridad referencial se valida en la capa de aplicación (server actions).
+model Conexion {
+  id                String       @id @default(uuid()) @db.Uuid
+  capituloId        String       @map("capitulo_id") @db.Uuid
+  entidadOrigenTipo EntidadTipo  @map("entidad_origen_tipo")
+  entidadOrigenId   String       @map("entidad_origen_id") @db.Uuid
+  entidadDestinoTipo EntidadTipo @map("entidad_destino_tipo")
+  entidadDestinoId  String       @map("entidad_destino_id") @db.Uuid
+  tipoRelacion      TipoRelacion @map("tipo_relacion")
+  nota              String?
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  @@index([entidadOrigenTipo, entidadOrigenId])
+  @@index([entidadDestinoTipo, entidadDestinoId])
+  @@index([capituloId])
+  @@map("conexion")
+}
+
+// ===========================================================================
+// MONETIZACIÓN (entidades DORMIDAS — Horizonte 2 / 3, sin lógica en el MDP)
+// ===========================================================================
+
+/// Plan de suscripción. Dormida: ningún flujo del MDP la lee ni escribe.
+model Plan {
+  id          String   @id @default(uuid()) @db.Uuid
+  nombre      String
+  descripcion String?
+  precioMxn   Decimal? @map("precio_mxn") @db.Decimal(10, 2)
+  intervalo   String?  // ej. "mensual", "trimestral", "unico"
+  activo      Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  suscripciones Suscripcion[]
+
+  @@map("plan")
+}
+
+/// Suscripción de un miembro a un plan. Dormida: sin lógica activa en el MDP.
+model Suscripcion {
+  id          String            @id @default(uuid()) @db.Uuid
+  miembroId   String            @map("miembro_id") @db.Uuid
+  planId      String            @map("plan_id") @db.Uuid
+  estado      EstadoSuscripcion @default(cancelada)
+  fechaInicio DateTime?         @map("fecha_inicio")
+  fechaFin    DateTime?         @map("fecha_fin")
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  miembro Miembro @relation(fields: [miembroId], references: [id], onDelete: Cascade)
+  plan    Plan    @relation(fields: [planId], references: [id])
+
+  @@index([miembroId])
+  @@map("suscripcion")
+}
+
+/// Patrocinador comercial de pieza o evento específico (Horizonte 3).
+/// Dormida y deliberadamente separada de AliadoFundador desde el día uno.
+model Sponsor {
+  id          String   @id @default(uuid()) @db.Uuid
+  capituloId  String   @map("capitulo_id") @db.Uuid
+  nombre      String
+  logo        String?
+  link        String?
+  tipo        String?
+  activo      Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  capitulo Capitulo @relation(fields: [capituloId], references: [id], onDelete: Cascade)
+
+  @@index([capituloId])
+  @@map("sponsor")
+}
