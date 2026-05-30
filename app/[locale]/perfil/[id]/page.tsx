@@ -7,6 +7,8 @@ import { MiembroAvatar } from '@/components/MiembroAvatar';
 import { RolBadge } from '@/components/RolBadge';
 import { TerritorioBadge } from '@/components/TerritorioBadge';
 
+export const dynamic = 'force-dynamic';
+
 export default async function PerfilPublicoPage({
   params,
 }: {

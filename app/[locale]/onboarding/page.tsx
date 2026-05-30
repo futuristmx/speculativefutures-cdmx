@@ -7,6 +7,8 @@ import { AppShell } from '@/components/AppShell';
 import { FormularioOnboarding } from '@/components/FormularioOnboarding';
 import { WIsotype } from '@/components/ui/WIsotype';
 
+export const dynamic = 'force-dynamic';
+
 export default async function OnboardingPage({
   params,
 }: {

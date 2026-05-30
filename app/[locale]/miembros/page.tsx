@@ -7,6 +7,8 @@ import { MiembroCard, type MiembroCardData } from '@/components/MiembroCard';
 
 const POR_PAGINA = 20;
 
+export const dynamic = 'force-dynamic';
+
 export default async function MiembrosPage({
   params,
   searchParams,

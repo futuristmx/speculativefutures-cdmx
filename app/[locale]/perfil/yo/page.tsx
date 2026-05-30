@@ -8,6 +8,8 @@ import { FormularioOnboarding } from '@/components/FormularioOnboarding';
 import { AvatarUploader } from '@/components/AvatarUploader';
 import { RolBadge } from '@/components/RolBadge';
 
+export const dynamic = 'force-dynamic';
+
 export default async function PerfilPropioPage({
   params,
 }: {

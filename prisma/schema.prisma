@@ -99,6 +99,7 @@ enum EstadoEvento {
 /// Estado de la asistencia de un miembro a un evento.
 enum EstadoRSVP {
   registrado
+  cancelado
   asistio
   no_asistio
 }
@@ -346,7 +347,10 @@ model Evento {
   estado             EstadoEvento    @default(borrador)
   fechaInicio        DateTime        @map("fecha_inicio")
   fechaFin           DateTime?       @map("fecha_fin")
-  ubicacion          String?
+  /// (D-S3-3) Ubicación estructurada según modalidad. JSON con forma:
+  /// { urlOnline?, plataforma?, direccion?, mapsUrl? }. online usa
+  /// url+plataforma; presencial usa direccion+mapsUrl; hibrido ambos.
+  ubicacion          Json?
   capacidad          Int?
   /// Idiomas del evento (default español; en+es si hay ponentes internacionales).
   idiomas            String[]        @default(["es"])
@@ -370,17 +374,20 @@ model Evento {
 
 /// Inscripción de un miembro a un evento.
 model RSVP {
-  id            String     @id @default(uuid()) @db.Uuid
-  miembroId     String     @map("miembro_id") @db.Uuid
-  eventoId      String     @map("evento_id") @db.Uuid
-  estado        EstadoRSVP @default(registrado)
-  fechaRegistro DateTime   @default(now()) @map("fecha_registro")
+  id               String     @id @default(uuid()) @db.Uuid
+  miembroId        String     @map("miembro_id") @db.Uuid
+  eventoId         String     @map("evento_id") @db.Uuid
+  estado           EstadoRSVP @default(registrado)
+  fechaRegistro    DateTime   @default(now()) @map("fecha_registro")
+  /// (D-S3-5) Timestamp de cancelación; el RSVP no se borra, queda historial.
+  fechaCancelacion DateTime?  @map("fecha_cancelacion")
 
   miembro Miembro @relation(fields: [miembroId], references: [id], onDelete: Cascade)
   evento  Evento  @relation(fields: [eventoId], references: [id], onDelete: Cascade)
 
   @@unique([miembroId, eventoId]) // un RSVP por miembro por evento
   @@index([eventoId])
+  @@index([estado])
   @@map("rsvp")
 }
 
