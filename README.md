@@ -103,12 +103,48 @@ Supabase). Requiere `SUPABASE_SERVICE_ROLE_KEY` en el entorno.
 
 ---
 
+## Setup inicial de migraciones (baseline)
+
+El schema se aplicó por primera vez en la DB vía SQL generado offline (el
+entorno de CI/Code no alcanza los puertos de Postgres; ver `CLAUDE.md`). Por
+eso `prisma/migrations/` está vacío aunque el schema ya vive en la DB. Para
+sincronizar el historial de migraciones —**desde una máquina con acceso
+directo a la DB**— se crea una baseline una sola vez:
+
+```bash
+mkdir -p prisma/migrations/0_init
+npx prisma migrate diff \
+  --from-empty \
+  --to-schema-datamodel prisma/schema.prisma \
+  --script > prisma/migrations/0_init/migration.sql
+
+npx prisma migrate resolve --applied 0_init
+npx prisma migrate status
+```
+
+Tras esto, las migraciones siguientes funcionan con
+`prisma migrate dev --name <descriptor>` con normalidad.
+
+---
+
 ## Preview deployments
 
 Cada PR genera un preview en Vercel con su propia rama de Supabase
 (database branching). El flujo `db:setup` aplica schema + políticas en la rama
 antes de validar. La disciplina de costos y limpieza de ramas está en
 `CLAUDE.md` (Política de Supabase Database Branching).
+
+### Integración Vercel ↔ Supabase (configuración inicial, una vez)
+
+Operación de dashboards (equipo Change Consulting), no de código:
+
+1. **Vercel Marketplace → Supabase integration** → conectar el proyecto.
+2. **Sincronizar variables de entorno** en los entornos _production_ y
+   _preview_ (las de `.env.example`).
+3. **Database branching**: activar la auto-destrucción de la rama de Supabase
+   al cerrar el PR (ver `CLAUDE.md` → Política de Branching).
+4. **Verificar**: abrir un PR de prueba (cambio trivial en `docs/`) y confirmar
+   que se genera un preview deployment con su propia rama de DB.
 
 ---
 

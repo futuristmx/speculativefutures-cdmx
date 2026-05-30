@@ -47,9 +47,10 @@ y marcada como pendiente de credenciales.
   Futurist.mx, y (O1) Curador Core inicial vía `SEED_CURADOR_CORE_EMAIL`.
   Idempotente (upsert).
 - **Trigger** (`supabase/policies/00_trigger_miembro.sql`): `handle_new_user`
-  crea el Miembro base (`capitulo_id = cdmx`, `rol_contribucion = regular`,
-  `onboarding_completado = false`) y **reconcilia** por email el curador core
-  precargado (ver "Decisiones", D1).
+  hace un INSERT simple e idempotente (`ON CONFLICT (user_id) DO NOTHING`) del
+  Miembro base (`capitulo_id = cdmx`, `rol_contribucion = regular`,
+  `onboarding_completado = false`). Sin reconciliación por email — el curador
+  core inicial se crea en el seed vía Admin API (ver DESV-1).
 - **RLS** (`supabase/policies/`): `01_helpers`, `02_senial`, `03_evento_rsvp`,
   `04_pieza_aliado`, `05_miembro`, y **(O3)** `06_storage` con los 4 buckets
   (`avatars`, `eventos`, `aliados`, `dossiers`) y sus políticas en SQL.

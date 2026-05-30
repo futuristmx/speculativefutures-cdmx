@@ -62,3 +62,38 @@ Reglas:
 
 Todos los entregables se producen como producto de Change Consulting.
 Sin co-autoría visible, sin firmas automáticas, sin metadata de generación.
+
+## Política de aplicación de SQL contra DB Supabase
+
+El entorno de construcción de Claude Code no tiene acceso a los puertos
+5432 (directo) ni 6543 (pooler) de Supabase. Solo tráfico web (443) está
+habilitado.
+
+Flujo obligatorio para cambios de schema o políticas:
+
+1. Code escribe schema en prisma/schema.prisma y políticas en
+   supabase/policies/
+2. Code genera SQL offline vía `prisma migrate diff` y deja archivos
+   listos en supabase/policies/ o en la migración correspondiente
+3. El equipo Change Consulting aplica el SQL manualmente, en orden
+   numérico, desde el SQL Editor de Supabase (web, 443) o desde máquina
+   local con acceso directo a la DB
+4. Code verifica resultado con queries SELECT vía Supabase JS client
+   (fetch, edge-safe, port 443)
+5. Una vez aplicado, ejecutar `prisma migrate resolve --applied <nombre>`
+   desde máquina con acceso directo para sincronizar el historial de
+   migraciones
+
+Excepción: el seed (prisma/seed.ts) usa Supabase JS via fetch para
+llamar Admin API; sí funciona desde el sandbox de Code una vez
+configurada SUPABASE_SERVICE_ROLE_KEY.
+
+## Email transaccional en producción (O13 / O14)
+
+Antes del primer deploy productivo (merge a `main` → speculativefutures.mx):
+
+- Verificar el dominio `speculativefutures.mx` en Resend (DNS: SPF, DKIM,
+  DMARC). Para preview deployments es aceptable el sender de prueba
+  `onboarding@resend.dev`.
+- Una vez verificado, cambiar en Supabase Auth → SMTP Settings el sender de
+  `onboarding@resend.dev` a `no-reply@speculativefutures.mx`.
