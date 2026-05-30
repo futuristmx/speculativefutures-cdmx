@@ -22,3 +22,6 @@ chats/
 
 # Inventario técnico (entregable externo, no versionado)
 INVENTARIO_TECNICO.md
+
+# Workflow pendiente de añadir manualmente (token sin scope workflow)
+.github/workflows/ci.yml
