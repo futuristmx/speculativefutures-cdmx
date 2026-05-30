@@ -1,14 +1,14 @@
 'use client';
-import { useState } from 'react';
 import { Reveal } from '@/components/ui/Reveal';
 import { Eyebrow } from '@/components/ui/Eyebrow';
 import { NodeNetwork } from '@/components/ui/NodeNetwork';
-import { ContactFormOverlay } from '@/components/overlays/ContactFormOverlay';
 import { C, FONT, meta } from '@/lib/tokens';
 
-export function NextEvent() {
-  const [open, setOpen] = useState(false);
+interface NextEventProps {
+  onContact: () => void;
+}
 
+export function NextEvent({ onContact }: NextEventProps) {
   return (
     <>
       <section
@@ -64,7 +64,7 @@ export function NextEvent() {
                 escríbenos — construimos esto juntos.
               </p>
               <button
-                onClick={() => setOpen(true)}
+                onClick={onContact}
                 style={{
                   fontFamily: FONT,
                   fontWeight: 500,
@@ -96,8 +96,6 @@ export function NextEvent() {
           </div>
         </div>
       </section>
-
-      <ContactFormOverlay open={open} onClose={() => setOpen(false)} />
     </>
   );
 }
