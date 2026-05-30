@@ -6,9 +6,9 @@
 
 ## Preámbulo
 
-Este documento evoluciona el estado actual del proyecto (landing page funcional en `speculativefutures.mx`) hacia la web app completa definida en `speculative-futures-lineamientos.md`. No se escribe código de producto en este sprint: solo arquitectura y el esquema de datos (`prisma/schema.prisma`).
+Este documento evoluciona el estado actual del proyecto (landing page funcional en `speculativefutures.mx`) hacia la web app completa definida en `docs/strategy/LINEAMIENTOS.md`. No se escribe código de producto en este sprint: solo arquitectura y el esquema de datos (`prisma/schema.prisma`).
 
-**Jerarquía de fuentes:** ante conflicto, prevalece `speculative-futures-lineamientos.md`. Los conflictos detectados se señalan explícitamente en cada sección y se consolidan en la Sección 13; no se resuelven unilateralmente.
+**Jerarquía de fuentes:** ante conflicto, prevalece `docs/strategy/LINEAMIENTOS.md`. Los conflictos detectados se señalan explícitamente en cada sección y se consolidan en la Sección 13; no se resuelven unilateralmente.
 
 **Alcance del MDP:** mínimo *deseable* de producto (no MVP). Todos los módulos de las cuatro olas entran completos. La infraestructura de multi-capítulo y monetización se prepara dormida, sin UX activa.
 
