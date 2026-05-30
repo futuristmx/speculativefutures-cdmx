@@ -27,3 +27,6 @@ INVENTARIO_TECNICO.md
 # fuente real vive en prisma/schema.prisma y supabase/policies/)
 SUPABASE_SETUP.sql
 VERIFICAR.sql
+
+# Entregable de revisión para el chat (no versionado)
+SPRINT-2-PARA-REVISION.md
