@@ -2,7 +2,21 @@
 
 ## Infraestructura base + limpieza
 
-### Change Consulting · Mayo 2026
+### Change Consulting · Mayo 2026 · rev. 2 (Correcciones Sprint 1 aplicadas)
+
+---
+
+## Correcciones del chat estratégico aplicadas (rev. 2)
+
+1. **DESV-1 revertida** — `Miembro.user_id` vuelve a obligatorio + único; se
+   confirma `@@unique([capituloId, email])`. (Detalle en DESV-1, ahora RESUELTA.)
+2. **Trigger simplificado** — `handle_new_user` queda como INSERT idempotente
+   (`ON CONFLICT (user_id) DO NOTHING`), sin reconciliación por email.
+3. **Seed con Admin API** — el curador core se crea vía
+   `supabase.auth.admin.createUser` (dispara el trigger) + `upsert` a
+   `curador_core`. Nueva dependencia: `SUPABASE_SERVICE_ROLE_KEY` en el seed.
+4. **Re-validado** — `prisma validate`, `prisma format`, `typecheck`, `lint`,
+   `build` en verde tras los cambios.
 
 ---
 
@@ -111,7 +125,7 @@ y marcada como pendiente de credenciales.
 | 5 | Trigger crea Miembro con valores correctos | **SQL listo**; verificación pendiente de DB viva |
 | 6 | Middleware redirige a `/onboarding` sin onboarding | **Implementado**; verificación end-to-end pendiente de DB viva |
 | 7 | Middleware redirige a `/login` anónimo en ruta privada | **Implementado y compilado** |
-| 8 | Seed crea capítulo, 5 territorios, aliado, curador core | **Código listo**; ejecución pendiente de DB viva |
+| 8 | Seed crea capítulo, 5 territorios, aliado, curador core | **Código listo** (curador core vía Admin API: createUser → trigger → upsert a curador_core); ejecución pendiente de DB viva + service role key |
 | 9 | RLS senial: anónimo solo ve publicadas; core ve borradores | **SQL listo**; verificación pendiente de DB viva |
 | 10 | RLS Storage: avatars lectura pública; dossiers rechaza anónimo | **SQL listo (O3)**; verificación pendiente de DB viva |
 | 11 | `/es` y `/en` resuelven; banner inglés | **Implementado y compilado** (banner: string i18n presente; render en home se conecta en Sprint siguiente de UI) |
@@ -175,7 +189,8 @@ En preview/producción: `npm run db:setup` (migrate deploy + policies).
 
 ## Decisiones tomadas durante la construcción
 
-- **D1 — `Miembro.user_id` pasa a opcional.** (Ver Desviaciones.)
+- **D1 — `Miembro.user_id` obligatorio + único; seed vía Admin API.** (Ver
+  DESV-1, resuelta por el chat estratégico.)
 - **D2 — Lectura de onboarding en middleware vía Supabase, no Prisma.** El
   middleware corre en edge runtime y Prisma 6 no es edge-compatible. Se lee
   `onboarding_completado` con el cliente Supabase (fetch, edge-safe). Prisma se
@@ -191,28 +206,43 @@ En preview/producción: `npm run db:setup` (migrate deploy + policies).
 
 ## Desviaciones del plan (señaladas, no resueltas unilateralmente)
 
-### DESV-1 — `Miembro.user_id` opcional (tensión O1 ↔ vínculo auth.users)
+### DESV-1 — `Miembro.user_id` obligatorio + único — RESUELTA (no aceptada)
 
-**Conflicto.** El schema de Sprint 0 define `Miembro.user_id` como obligatorio
-y único (`String @unique`). La observación **O1** exige precargar en el seed un
-Miembro `curador_core` **antes** de que el fundador haga login — momento en el
-que aún no existe su `auth.users.id`. Ambas condiciones no pueden cumplirse a
-la vez con `user_id` NOT NULL.
+**Estado: RESUELTA por decisión del chat estratégico (Correcciones Sprint 1).**
 
-**Resolución aplicada (provisional, sujeta a revisión del chat estratégico):**
-`user_id` pasa a `String?` (opcional). Un Miembro puede existir como registro
-de aplicación sin cuenta de auth; el trigger `handle_new_user` reconcilia el
-`user_id` por email en el primer login, preservando el rol. La unicidad se
-mantiene (`@unique` sobre nullable permite múltiples NULL en PostgreSQL pero un
-solo valor real por user). Las RLS filtran por `user_id = auth.uid()`, así que
-un registro con `user_id` NULL nunca es visible/editable por ningún cliente
-autenticado hasta reconciliarse.
+La propuesta provisional del primer entregable (hacer `user_id` opcional para
+precargar el curador core sin `auth.users`) **fue revertida**. El chat
+estratégico decidió mantener `Miembro.user_id` obligatorio y único — todo
+Miembro corresponde siempre a un `auth.users` de Supabase — y resolver O1 por
+la vía que originalmente se había descartado: **crear el usuario de auth en el
+seed vía Admin API**.
 
-**Por qué se señala:** cambia una restricción del schema aprobado en Sprint 0.
-Alternativas no elegidas: (a) crear el `auth.users` del fundador
-programáticamente en el seed vía Admin API (acopla el seed a credenciales de
-auth y a la red); (b) tabla separada de "invitaciones de rol". Se eligió la
-opción de menor acoplamiento. **Requiere validación del chat estratégico.**
+**Solución aplicada:**
+
+1. **Schema** — `Miembro.user_id` vuelve a `String @unique` (NOT NULL). Se
+   confirma `@@unique([capituloId, email])` presente.
+2. **Trigger `handle_new_user`** — simplificado: INSERT directo con
+   `rol_contribucion = 'regular'`, `onboarding_completado = false`, e
+   **idempotente** (`ON CONFLICT (user_id) DO NOTHING`). Se elimina la lógica
+   de reconciliación por email (ya no hay Miembros pendientes de vincular).
+3. **Seed** — el bloque del curador core usa `@supabase/supabase-js` con la
+   service role key: `auth.admin.listUsers` (reusar si existe) o
+   `auth.admin.createUser({ email, email_confirm: true })`. `createUser`
+   dispara el trigger, que crea el Miembro con rol `regular`; el seed luego
+   hace `upsert` sobre `user_id` para promoverlo a `curador_core`. El upsert
+   cubre ambos casos (Miembro ya creado por el trigger, o ausente por estado
+   inconsistente). La idempotencia del trigger evita el doble-insert.
+
+**Nueva dependencia operativa:** el seed ahora requiere
+`SUPABASE_SERVICE_ROLE_KEY` y `NEXT_PUBLIC_SUPABASE_URL` en el entorno (además
+de `SEED_CURADOR_CORE_EMAIL`). Documentado en README y `.env.example`.
+
+**Adaptación señalada (no es desviación, es fidelidad al schema):** el SQL de
+referencia del trigger en las correcciones usa `capitulo_id = 'cdmx'` y
+`created_at`. El schema de este proyecto modela `capitulo_id` como UUID (FK a
+`capitulo.id`) y la columna de alta como `fecha_registro`. El trigger resuelve
+el UUID del capítulo por su `codigo = 'cdmx'` y usa los nombres reales de
+columna, conservando la intención (INSERT simple e idempotente).
 
 ### DESV-2 — Criterios dependientes de servicios externos
 
@@ -241,9 +271,10 @@ Ver `.env.example`. Para correr el proyecto en local hace falta, como mínimo:
    criterios 1–6, 8–10.
 3. Abrir PR de `feat/sprint-1-infra` → validar CI (criterio 17) y preview
    (criterio 3).
-4. Este documento regresa al chat estratégico para revisión. **Sprint 2 no
-   inicia sin `REVISION.md` aprobada del Sprint 1** (CLAUDE.md). La DESV-1
-   requiere veredicto explícito.
+4. Este documento regresa al chat estratégico para `REVISION.md` final del
+   Sprint 1. **Sprint 2 no inicia sin esa revisión aprobada** (CLAUDE.md).
+   DESV-1 ya quedó resuelta por las Correcciones Sprint 1 (Admin API + trigger
+   idempotente); no hay desviaciones abiertas que requieran veredicto.
 
 ---
 
