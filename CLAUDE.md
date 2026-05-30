@@ -13,6 +13,7 @@ de instrucción explícita por sprint:
 - Revisiones arquitectónicas → docs/sprints/sprint-N/REVISION.md
 
 Convenciones:
+
 - Archivos siempre en MAYÚSCULAS_CON_GUIONES_BAJOS.md
 - Commits con prefijo "docs(strategy|sprint-N):"
 - Nunca borrar versiones anteriores — usar git history para trazabilidad

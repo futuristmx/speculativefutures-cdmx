@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "eventos": "Events",
+    "territorios": "Territories",
+    "manifiesto": "Manifesto",
+    "contacto": "Contact",
+    "comunidad": "Community",
+    "unete": "Join",
+    "dashboard": "Dashboard",
+    "salir": "Sign out"
+  },
+  "home": {
+    "bannerIngles": "Some content available in English",
+    "bannerInglesLink": "View English content"
+  },
+  "manifiesto": {
+    "comingSoon": "Manifesto coming soon"
+  },
+  "errores": {
+    "noEncontrado": "Page not found."
+  },
+  "comun": {
+    "cargando": "Loading…"
+  }
+}

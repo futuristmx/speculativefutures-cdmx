@@ -1,21 +1,7 @@
-import type { Metadata } from 'next';
-import './globals.css';
+import type { ReactNode } from 'react';
 
-export const metadata: Metadata = {
-  title: 'Speculative Futures CDMX',
-  description: 'Comunidad interdisciplinaria para imaginar, cuestionar y activar futuros posibles desde Ciudad de México.',
-  openGraph: {
-    title: 'Speculative Futures CDMX',
-    description: 'Comunidad para imaginar, cuestionar y activar futuros posibles desde CDMX.',
-    locale: 'es_MX',
-    type: 'website',
-  },
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="es">
-      <body>{children}</body>
-    </html>
-  );
+// Layout raíz mínimo. El <html>/<body> con lang correcto y el provider de
+// next-intl viven en app/[locale]/layout.tsx, que conoce el locale activo.
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return children;
 }

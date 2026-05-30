@@ -1,0 +1,47 @@
+/* AUTO-GENERADO desde styles/tokens.ts — no editar a mano. */
+/* Regenerar: npm run tokens:build */
+:root {
+  --sf-petrol-900: #062424;
+  --sf-petrol-800: #0B3331;
+  --sf-petrol-700: #114442;
+  --sf-slate-500: #547476;
+  --sf-emerald-500: #439973;
+  --sf-mint-400: #66EBAC;
+  --sf-cal-50: #F4F7F5;
+  --sf-cal-0: #FFFFFF;
+  --sf-ink-900: #062424;
+  --sf-ink-700: #1E3B39;
+  --sf-ink-500: #5A716F;
+  --sf-line-light: #D8E2DF;
+  --sf-body-dark: #C4D6CF;
+  --bg: var(--sf-petrol-900);
+  --surface: var(--sf-petrol-800);
+  --border: var(--sf-petrol-700);
+  --text: var(--sf-cal-50);
+  --text-body: var(--sf-body-dark);
+  --text-muted: var(--sf-slate-500);
+  --accent: var(--sf-mint-400);
+  --link: var(--sf-mint-400);
+  --font: 'Gotham', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --tracking-meta: 0.08em;
+  --tracking-tight: -0.02em;
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --s-24: 96px;
+  --s-32: 128px;
+  --r-sm: 2px;
+  --r-md: 4px;
+  --r-pill: 999px;
+  --ease: cubic-bezier(.2,.6,.2,1);
+  --dur-fast: 180ms;
+  --dur: 400ms;
+  --dur-slow: 700ms;
+  --container-max: 1280px;
+  --hair-bg: repeating-linear-gradient(to right, rgba(84,116,118,.05) 0 1px, transparent 1px 96px);
+}

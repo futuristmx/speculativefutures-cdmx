@@ -192,7 +192,13 @@ model Capitulo {
 /// auth.users correspondiente (ver Sección 5 del documento de arquitectura).
 model Miembro {
   id                          String          @id @default(uuid()) @db.Uuid
-  userId                      String          @unique @map("user_id") @db.Uuid // = auth.users.id
+  /// = auth.users.id. OPCIONAL: un Miembro puede existir como registro de
+  /// aplicación antes de tener cuenta de auth (caso del curador core sembrado
+  /// por O1, que se precarga por email antes de que el fundador haga login).
+  /// Al registrarse con ese email, se reconcilia el user_id. RLS filtra por
+  /// user_id = auth.uid(), así que un registro con user_id null nunca es
+  /// visible/editable por ningún cliente autenticado hasta reconciliarse.
+  userId                      String?         @unique @map("user_id") @db.Uuid
   capituloId                  String          @map("capitulo_id") @db.Uuid
   nombre                      String
   email                       String
@@ -206,6 +212,12 @@ model Miembro {
   /// Si rolContribucion = curador_comunidad y este valor < 3 → cola de revisión.
   /// Si >= 3 → publicación directa con auditoría post-hoc (auditada = false).
   senialesPublicadasAprobadas Int             @default(0) @map("seniales_publicadas_aprobadas")
+  /// (O6) El middleware redirige a /onboarding mientras sea false. El trigger
+  /// lo crea en false; se marca true al completar el onboarding obligatorio.
+  onboardingCompletado        Boolean         @default(false) @map("onboarding_completado")
+  /// (O5) Cuota blanda informativa de 1 señal/mes para Curador Comunidad.
+  /// Sin enforcement técnico; alimenta el mensaje del dashboard (Sprint 4).
+  fechaUltimaPublicacionAprobada DateTime?    @map("fecha_ultima_publicacion_aprobada")
   estado                      EstadoMiembro   @default(activo)
   /// Vínculo opcional (muchos-a-uno) con el aliado fundador que el miembro
   /// representa. NO otorga rol_contribucion especial — es solo afiliación

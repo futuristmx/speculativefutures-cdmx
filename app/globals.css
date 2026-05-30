@@ -46,62 +46,19 @@
   src: url('/fonts/Gotham-Black.otf') format('opentype');
 }
 
-:root {
-  /* === CORE PALETTE ========================================================= */
-  --sf-petrol-900: #062424;
-  --sf-petrol-800: #0B3331;
-  --sf-petrol-700: #114442;
-  --sf-slate-500: #547476;
-  --sf-emerald-500: #439973;
-  --sf-mint-400: #66EBAC;
-  --sf-cal-50: #F4F7F5;
-  --sf-cal-0: #FFFFFF;
+/* Las variables de diseño (:root { --sf-*, --bg, --accent, … }) se generan
+   desde styles/tokens.ts → styles/tokens.css, importado antes de este archivo
+   en app/[locale]/layout.tsx. No redeclarar aquí para evitar duplicación. */
 
-  /* === TEXT NEUTRALS ======================================================== */
-  --sf-ink-900: #062424;
-  --sf-ink-700: #1E3B39;
-  --sf-ink-500: #5A716F;
-  --sf-line-light: #D8E2DF;
-  --sf-body-dark: #C4D6CF;
-
-  /* === SEMANTIC ROLES (dark-first) ========================================== */
-  --bg: var(--sf-petrol-900);
-  --surface: var(--sf-petrol-800);
-  --border: var(--sf-petrol-700);
-  --text: var(--sf-cal-50);
-  --text-body: var(--sf-body-dark);
-  --text-muted: var(--sf-slate-500);
-  --accent: var(--sf-mint-400);
-  --link: var(--sf-mint-400);
-
-  /* === TYPE ================================================================= */
-  --font: 'Gotham', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
-  --tracking-meta: 0.08em;
-  --tracking-tight: -0.02em;
-
-  /* === SPACING ============================================================== */
-  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-6: 24px;
-  --s-8: 32px; --s-12: 48px; --s-16: 64px; --s-24: 96px; --s-32: 128px;
-
-  /* === RADII ================================================================ */
-  --r-sm: 2px;
-  --r-md: 4px;
-  --r-pill: 999px;
-
-  /* === MOTION =============================================================== */
-  --ease: cubic-bezier(.2,.6,.2,1);
-  --dur-fast: 180ms;
-  --dur: 400ms;
-  --dur-slow: 700ms;
-
-  /* === LAYOUT =============================================================== */
-  --container-max: 1280px;
-  --hair-bg: repeating-linear-gradient(to right, rgba(84,116,118,.05) 0 1px, transparent 1px 96px);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
-
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
@@ -111,9 +68,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 11px; }
-::-webkit-scrollbar-track { background: var(--sf-petrol-900); }
-::-webkit-scrollbar-thumb { background: var(--sf-petrol-700); border-radius: 6px; }
+::-webkit-scrollbar {
+  width: 11px;
+}
+::-webkit-scrollbar-track {
+  background: var(--sf-petrol-900);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--sf-petrol-700);
+  border-radius: 6px;
+}
 
 /* ============================================================================
    SCROLL REVEAL — fade + 8px rise, 400ms ease-out
@@ -121,34 +85,66 @@ body {
 .reveal {
   opacity: 0;
   transform: translateY(8px);
-  transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
+  transition:
+    opacity var(--dur-slow) var(--ease),
+    transform var(--dur-slow) var(--ease);
   transition-delay: var(--reveal-delay, 0ms);
 }
 .reveal.in {
   opacity: 1;
   transform: translateY(0);
 }
-.no-motion .reveal { opacity: 1; transform: none; transition: none; }
+.no-motion .reveal {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
 
 /* ============================================================================
    NODE NETWORK ANIMATIONS
    ============================================================================ */
 @keyframes lineIn {
-  from { stroke-dashoffset: 1000; opacity: 0; }
-  to   { stroke-dashoffset: 0; opacity: 1; }
+  from {
+    stroke-dashoffset: 1000;
+    opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
 }
 @keyframes dotIn {
-  from { opacity: 0; transform: scale(0); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes signalPulse {
-  0%   { transform: scale(1); opacity: .7; }
-  70%  { transform: scale(2.4); opacity: 0; }
-  100% { transform: scale(2.4); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
 }
 @keyframes kickerBlink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: .4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 .nodenet .netline {
@@ -171,45 +167,70 @@ body {
   animation: signalPulse 2.4s ease-out infinite;
   animation-delay: 600ms;
 }
-.nodenet.in .netline, .nodenet.in .netdot, .nodenet.in .netsignal circle:first-child {
+.nodenet.in .netline,
+.nodenet.in .netdot,
+.nodenet.in .netsignal circle:first-child {
   /* animations only play when in-view */
 }
 
 /* kicker dot blinks */
-.kicker-dot { animation: kickerBlink 2.8s ease-in-out infinite; }
+.kicker-dot {
+  animation: kickerBlink 2.8s ease-in-out infinite;
+}
 
 /* ============================================================================
    COMPONENT HOVER STATES
    ============================================================================ */
-.signal-card:hover { background: #EDF2EF !important; }
+.signal-card:hover {
+  background: #edf2ef !important;
+}
 .voz-card:hover {
   border-color: var(--sf-petrol-700) !important;
   transform: translateY(-3px);
 }
-.terr-row:hover h3 { color: var(--sf-mint-400); }
-.terr-row { transition: all .18s; }
+.terr-row:hover h3 {
+  color: var(--sf-mint-400);
+}
+.terr-row {
+  transition: all 0.18s;
+}
 
 /* ============================================================================
    RESPONSIVE HELPERS
    ============================================================================ */
 
 /* Desktop nav visible by default; hamburger hidden */
-.nav-hamburger { display: none !important; }
+.nav-hamburger {
+  display: none !important;
+}
 
 /* Top menu hover → mint */
-.nav-link { transition: color .18s var(--ease); }
-.nav-link:hover { color: var(--sf-mint-400) !important; }
+.nav-link {
+  transition: color 0.18s var(--ease);
+}
+.nav-link:hover {
+  color: var(--sf-mint-400) !important;
+}
 
 @media (max-width: 880px) {
   /* Nav: swap desktop menu for hamburger */
-  .nav-desktop { display: none !important; }
-  .nav-hamburger { display: flex !important; }
+  .nav-desktop {
+    display: none !important;
+  }
+  .nav-hamburger {
+    display: flex !important;
+  }
 }
 
 @media (max-width: 768px) {
   /* Stack two-column grids */
-  .hero-grid, .event-grid { grid-template-columns: 1fr !important; }
-  .hero-graphic { display: none !important; }
+  .hero-grid,
+  .event-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-graphic {
+    display: none !important;
+  }
 
   /* Territorios rows: number + title on top, description below */
   .terr-row {
@@ -221,13 +242,21 @@ body {
   }
 
   /* Manifesto / large headings breathe a bit less */
-  body { -webkit-text-size-adjust: 100%; }
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
 
   /* Tweaks widget: smaller + bottom-left so it doesn't cover CTAs */
-  .tweaks-panel { width: calc(100vw - 32px) !important; max-width: 300px; }
+  .tweaks-panel {
+    width: calc(100vw - 32px) !important;
+    max-width: 300px;
+  }
 }
 
 /* Prevent horizontal overflow on small screens */
 @media (max-width: 768px) {
-  html, body { overflow-x: hidden; }
+  html,
+  body {
+    overflow-x: hidden;
+  }
 }

@@ -10,7 +10,13 @@ interface WBtnProps {
   href?: string;
 }
 
-export function WBtn({ children, variant = 'primary', onClick, light = false, href }: WBtnProps) {
+export function WBtn({
+  children,
+  variant = 'primary',
+  onClick,
+  light = false,
+  href,
+}: WBtnProps) {
   const [hovered, setHovered] = useState(false);
 
   const base: React.CSSProperties = {

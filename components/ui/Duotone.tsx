@@ -7,8 +7,13 @@ interface DuotoneProps {
   seed?: number;
 }
 
-export function Duotone({ ratio = '4 / 5', label = 'retrato · duotono verde', radius = 8, seed = 0 }: DuotoneProps) {
-  const angle = 14 + (seed * 23) % 40;
+export function Duotone({
+  ratio = '4 / 5',
+  label = 'retrato · duotono verde',
+  radius = 8,
+  seed = 0,
+}: DuotoneProps) {
+  const angle = 14 + ((seed * 23) % 40);
   return (
     <div
       style={{
@@ -25,7 +30,7 @@ export function Duotone({ ratio = '4 / 5', label = 'retrato · duotono verde', r
         style={{
           position: 'absolute',
           inset: 0,
-          opacity: .5,
+          opacity: 0.5,
           backgroundImage: `repeating-linear-gradient(${angle}deg, rgba(67,153,115,.22) 0 2px, transparent 2px 9px)`,
         }}
       />
@@ -38,7 +43,8 @@ export function Duotone({ ratio = '4 / 5', label = 'retrato · duotono verde', r
           width: '46%',
           aspectRatio: '1',
           borderRadius: '50%',
-          background: 'radial-gradient(circle at 50% 38%, rgba(102,235,172,.16), rgba(67,153,115,.10) 60%, transparent 72%)',
+          background:
+            'radial-gradient(circle at 50% 38%, rgba(102,235,172,.16), rgba(67,153,115,.10) 60%, transparent 72%)',
         }}
       />
       <span

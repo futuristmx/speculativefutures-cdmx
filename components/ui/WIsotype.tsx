@@ -21,7 +21,14 @@ export function WIsotype({
       aria-label="SF CDMX"
     >
       <polygon points="33.51 48.75 139.57 24.09 107.74 128.8" fill={tri} />
-      <circle cx="84.95" cy="85.8" r="25.79" fill={node} stroke={stroke} strokeWidth="3" />
+      <circle
+        cx="84.95"
+        cy="85.8"
+        r="25.79"
+        fill={node}
+        stroke={stroke}
+        strokeWidth="3"
+      />
     </svg>
   );
 }

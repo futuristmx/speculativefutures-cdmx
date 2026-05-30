@@ -9,7 +9,10 @@ import { Footer } from '@/components/sections/Footer';
 import { JoinOverlay } from '@/components/overlays/JoinOverlay';
 import { ComunidadOverlay } from '@/components/overlays/ComunidadOverlay';
 import { ContactFormOverlay } from '@/components/overlays/ContactFormOverlay';
-import { TweaksWidget } from '@/components/ui/TweaksWidget';
+import { TweaksWidget } from '@/components/dev/TweaksWidget';
+
+// El widget de desarrollo sólo se incluye fuera de producción.
+const IS_DEV = process.env.NODE_ENV === 'development';
 
 export function SiteApp() {
   const [join, setJoin] = useState(false);
@@ -32,26 +35,41 @@ export function SiteApp() {
   return (
     <div style={{ background: '#062424', color: '#F4F7F5', minHeight: '100vh' }}>
       <Nav onJoin={() => setJoin(true)} onComunidad={() => setComunidad(true)} />
-      <Hero variant={variant} onJoin={() => setJoin(true)} headline={headline} showGrid={showGrid} />
+      <Hero
+        variant={variant}
+        onJoin={() => setJoin(true)}
+        headline={headline}
+        showGrid={showGrid}
+      />
       <NextEvent onContact={() => setContact(true)} />
       <Territorios showGrid={showGrid} />
       <Manifesto showGrid={showGrid} />
-      <Footer onJoin={() => setJoin(true)} onComunidad={() => setComunidad(true)} showGrid={showGrid} />
+      <Footer
+        onJoin={() => setJoin(true)}
+        onComunidad={() => setComunidad(true)}
+        showGrid={showGrid}
+      />
 
       <JoinOverlay open={join} onClose={() => setJoin(false)} />
-      <ComunidadOverlay open={comunidad} onClose={() => setComunidad(false)} onJoin={() => setJoin(true)} />
+      <ComunidadOverlay
+        open={comunidad}
+        onClose={() => setComunidad(false)}
+        onJoin={() => setJoin(true)}
+      />
       <ContactFormOverlay open={contact} onClose={() => setContact(false)} />
 
-      <TweaksWidget
-        variant={variant}
-        headline={headline}
-        showGrid={showGrid}
-        showMotion={showMotion}
-        onVariant={setVariant}
-        onHeadline={setHeadline}
-        onGrid={setShowGrid}
-        onMotion={setShowMotion}
-      />
+      {IS_DEV && (
+        <TweaksWidget
+          variant={variant}
+          headline={headline}
+          showGrid={showGrid}
+          showMotion={showMotion}
+          onVariant={setVariant}
+          onHeadline={setHeadline}
+          onGrid={setShowGrid}
+          onMotion={setShowMotion}
+        />
+      )}
     </div>
   );
 }
