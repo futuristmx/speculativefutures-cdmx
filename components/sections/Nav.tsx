@@ -62,6 +62,7 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
               <a
                 key={label}
                 href={href}
+                className="nav-link"
                 style={{ ...meta, color: C.BODY, textDecoration: 'none', fontSize: 12.5 }}
               >
                 {label}
@@ -70,6 +71,7 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
           </div>
           <button
             onClick={onComunidad}
+            className="nav-link"
             style={{ ...meta, color: C.CAL, fontSize: 12.5, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
             Comunidad

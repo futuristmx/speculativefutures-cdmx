@@ -196,6 +196,10 @@ body {
 /* Desktop nav visible by default; hamburger hidden */
 .nav-hamburger { display: none !important; }
 
+/* Top menu hover → mint */
+.nav-link { transition: color .18s var(--ease); }
+.nav-link:hover { color: var(--sf-mint-400) !important; }
+
 @media (max-width: 880px) {
   /* Nav: swap desktop menu for hamburger */
   .nav-desktop { display: none !important; }
