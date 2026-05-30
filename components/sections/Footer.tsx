@@ -4,6 +4,7 @@ import { Eyebrow } from '@/components/ui/Eyebrow';
 import { WLogo } from '@/components/ui/WLogo';
 import { WBtn } from '@/components/ui/WBtn';
 import { ContactForm } from '@/components/ui/ContactForm';
+import { InstagramLink } from '@/components/ui/InstagramLink';
 import { C, FONT, meta, HAIR } from '@/lib/tokens';
 
 interface FooterProps {
@@ -67,9 +68,12 @@ export function Footer({ onJoin, onComunidad, showGrid = true }: FooterProps) {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 20, paddingTop: 28, borderTop: `1px solid ${C.PETROL7}` }}>
           <WLogo dark />
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ ...meta, color: C.MINT }}>Señales entre el ruido</div>
-            <div style={{ ...meta, marginTop: 6 }}>19.4326° N · 99.1332° W · EST. 2026</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(20px,4vw,40px)', flexWrap: 'wrap' }}>
+            <InstagramLink size={20} label />
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ ...meta, color: C.MINT }}>Señales entre el ruido</div>
+              <div style={{ ...meta, marginTop: 6 }}>19.4326° N · 99.1332° W · EST. 2026</div>
+            </div>
           </div>
         </div>
       </div>

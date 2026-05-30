@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { WLogo } from '@/components/ui/WLogo';
 import { WBtn } from '@/components/ui/WBtn';
+import { InstagramLink } from '@/components/ui/InstagramLink';
 import { C, FONT, meta } from '@/lib/tokens';
 
 interface NavProps {
@@ -63,6 +64,7 @@ export function Nav({ onJoin, onComunidad }: NavProps) {
         >
           Comunidad
         </button>
+        <InstagramLink size={19} />
         <WBtn onClick={onJoin}>Únete</WBtn>
       </div>
     </nav>
