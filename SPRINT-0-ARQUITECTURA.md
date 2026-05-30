@@ -1,6 +1,6 @@
 # Speculative Futures CDMX — Sprint 0 Incremental
 ## Documento de Arquitectura de la Web App
-### Change Consulting · Mayo 2026 · v1.0
+### Change Consulting · Mayo 2026 · v1.1
 
 ---
 
@@ -87,10 +87,10 @@ Resumen de entidades:
 | Entidad | Propósito | Notas clave |
 |---|---|---|
 | `Capitulo` | Capítulo de la red; un registro `cdmx` en MDP. | `capitulo_id` en todas las entidades centrales. |
-| `Miembro` | Persona registrada; extiende `auth.users` por `user_id`. | `rol_contribucion`, `seniales_publicadas_aprobadas`, `email` único por capítulo. |
+| `Miembro` | Persona registrada; extiende `auth.users` por `user_id`. | `rol_contribucion`, `seniales_publicadas_aprobadas` (derivado de `RevisionSenial` con `estado=aprobada`), `email` único por capítulo, `aliado_fundador_id` + `rol_en_aliado` (afiliación, sin rol especial). |
 | `Territorio` | Taxonomía fija de cinco. | Seed inicial; `@@unique([capitulo_id, codigo])`. |
 | `Senial` | Unidad de inteligencia. | Enums `tipo`/`estado`, `idiomas[]`, `auditada`, índices por territorio/estado/fecha. |
-| `RevisionSenial` | Feedback + decisión editorial de curación. | Deriva de lineamientos §2 (sistema de feedback). |
+| `RevisionSenial` | Feedback + decisión editorial de curación, por ronda. | Entidad separada (confirmada). Campos: `senial_id`, `revisor_id` (curador_core), `estado` (aprobada/rechazada/requiere_edicion), `comentario_editorial`, `ronda`, `fecha_revision`. Múltiples rondas por señal. |
 | `Evento` | Producción de la comunidad. | `modalidad`, `ponentes` (JSON), `idiomas[]`, m2m con señales discutidas. |
 | `RSVP` | Miembro × Evento. | `@@unique([miembro_id, evento_id])`. |
 | `PiezaEditorial` | Ensayo/dossier/reporte/briefing. | `acceso_premium` default false, m2m con señales referenciadas. |
@@ -102,12 +102,15 @@ Resumen de entidades:
 
 **Vínculo con Supabase Auth:** Supabase gestiona `auth.users`. `Miembro.user_id` (UUID) referencia ese registro. No se crea tabla de tokens de magic link (Supabase la gestiona). La creación del `Miembro` se resuelve por **trigger PostgreSQL** (ver §5).
 
-**Decisiones y conflictos señalados en el schema (no resueltos unilateralmente):**
+**Decisiones resueltas por el chat estratégico (correcciones aprobadas, incorporadas):**
 
-1. **`RevisionSenial` añadida** — no está en la lista explícita de entidades del prompt, pero lineamientos §2 exige "sistema de feedback editorial" y "notificación al proponente cuando hay decisión". Se modela como entidad. *Pendiente de confirmación (Sección 13).*
-2. **`HorizonteTemporal` (valores)** — lineamientos nombran el campo sin fijar dominio. Valores provisionales `corto_plazo | mediano_plazo | largo_plazo`. *DIFERIBLE.*
-3. **`EstadoEvento` (valores)** — inferido de la acción "cancelar evento". *DIFERIBLE.*
-4. **`Miembro.aliado_fundador_id`** — los lineamientos definen "Aliado Fundador" como rol de permisos pero no especifican cómo una persona se vincula a la institución. Se modela vínculo opcional Miembro→AliadoFundador. *IMPORTANTE (Sección 13).*
+1. **`RevisionSenial` — entidad separada (confirmada).** No es un campo en `Senial`. Soporta múltiples rondas (`ronda: Int`), feedback (`comentario_editorial`) y decisión (`estado`: aprobada | rechazada | requiere_edicion). El revisor es un Miembro con rol `curador_core`. El contador `Miembro.seniales_publicadas_aprobadas` se calcula contra los registros de `RevisionSenial` con `estado = aprobada`. Constraint `@@unique([senial_id, ronda])`.
+2. **`HorizonteTemporal` (valores confirmados):** `ahora | emergente | mediano | largo | horizonte`.
+3. **`EstadoEvento` (valores confirmados):** `borrador | programado | lleno | en_curso | realizado | cancelado | pospuesto`.
+4. **`Miembro.aliado_fundador_id` (confirmado):** FK opcional muchos-a-uno + `rol_en_aliado` (texto libre). **No** otorga `rol_contribucion` especial — es afiliación institucional; el rol de permisos `aliado_fundador` se deriva del vínculo a nivel de aplicación.
+
+**Decisión diferida (registrada en Sección 13 y en el registro de deuda):**
+
 5. **Notificaciones** — se resuelven por email transaccional (Resend), sin entidad `Notificacion` en el MDP. *DIFERIBLE.*
 
 ---
@@ -398,7 +401,10 @@ alter table public.evento enable row level security;
 alter table public.rsvp   enable row level security;
 
 create policy evento_select_publicos on public.evento
-  for select using (estado in ('publicado','finalizado') or public.es_curador_core());
+  for select using (
+    estado in ('programado','lleno','en_curso','realizado','pospuesto')
+    or public.es_curador_core()
+  );
 create policy evento_cud_core on public.evento
   for all using (public.es_curador_core()) with check (public.es_curador_core());
 
@@ -588,14 +594,16 @@ Estas tareas se ejecutan como bloque de limpieza dentro del Sprint 1 (no como sp
 
 ## Sección 13 — Decisiones arquitectónicas pendientes
 
+### RESUELTAS por el chat estratégico (correcciones aprobadas, ya incorporadas)
+1. **Entidad `RevisionSenial`.** ✅ Resuelta: entidad separada con `estado` (aprobada/rechazada/requiere_edicion), `comentario_editorial`, `ronda`, `fecha_revision`; múltiples rondas por señal; revisor = `curador_core`. El contador `seniales_publicadas_aprobadas` se calcula contra `RevisionSenial` con `estado=aprobada`.
+2. **Vínculo Miembro ↔ AliadoFundador.** ✅ Resuelta: FK opcional `aliado_fundador_id` (muchos-a-uno) + `rol_en_aliado` (texto libre). No otorga `rol_contribucion` especial.
+3. **`HorizonteTemporal`.** ✅ Resuelta: `ahora | emergente | mediano | largo | horizonte`.
+4. **`EstadoEvento`.** ✅ Resuelta: `borrador | programado | lleno | en_curso | realizado | cancelado | pospuesto`.
+
 ### CRÍTICA (bloquea Sprint 1)
-1. **Confirmar entidad `RevisionSenial`.** Opciones: (a) entidad dedicada [recomendada] — soporta feedback, decisión e historial de curación que exigen los lineamientos §2; (b) campos sueltos en `Senial` — insuficiente para historial. **Recomendación: (a).** Requerida por Sprint 4, pero la migración inicial (Sprint 1) ya la crea, por eso es crítica ahora.
-2. **Vínculo Miembro ↔ AliadoFundador para el rol `aliado_fundador`.** Opciones: (a) FK opcional `Miembro.aliado_fundador_id` [recomendada]; (b) tabla intermedia muchos-a-muchos. **Recomendación: (a)** para el MDP (un representante por miembro); migrar a (b) si una institución necesita múltiples representantes con permisos. Requerida por el modelo de permisos (Sprint 1/2).
-3. **Estrategia de conexión Prisma con RLS.** Confirmar que Prisma usa rol que bypassa RLS y que toda mutación server-side valida rol en aplicación. **Recomendación:** Prisma con `DATABASE_URL` privilegiada + autorización en server actions; RLS como red de seguridad para el cliente Supabase. Requerida desde Sprint 1.
+5. **Estrategia de conexión Prisma con RLS.** Confirmar que Prisma usa rol que bypassa RLS y que toda mutación server-side valida rol en aplicación. **Recomendación:** Prisma con `DATABASE_URL` privilegiada + autorización en server actions; RLS como red de seguridad para el cliente Supabase. Requerida desde Sprint 1.
 
 ### IMPORTANTE (bloquea un sprint posterior)
-4. **Dominio de valores de `HorizonteTemporal`.** Provisional `corto/mediano/largo_plazo`. Confirmar nomenclatura editorial con Curador Core antes de Sprint 4 (señales). Cambiar valores después implica migración de enum.
-5. **Dominio de `EstadoEvento`.** Provisional `borrador/publicado/cancelado/finalizado`. Confirmar antes de Sprint 3.
 6. **Google OAuth: ¿se habilita en el MDP?** Lineamientos lo marcan opcional. Decisión antes de Sprint 1 (config de Supabase). **Recomendación:** habilitar solo magic link en MDP; OAuth diferible sin costo de refactor.
 7. **Modelo de notificaciones.** MDP: email transaccional (Resend), sin bandeja in-app. Reabrir si se requiere centro de notificaciones (post-MDP).
 
@@ -608,13 +616,27 @@ Estas tareas se ejecutan como bloque de limpieza dentro del Sprint 1 (no como sp
 
 ---
 
+## Registro de deuda técnica y decisiones diferidas
+
+Funcionalidades y decisiones diferidas de forma explícita (no ocultas), conforme al principio de "deuda técnica explícita" de los lineamientos.
+
+- **Módulo de pagos:** diferido a Horizonte 2 (mes 12+). Entidades `Plan`, `Suscripcion`, `Sponsor` y campo `acceso_premium` presentes pero dormidos.
+- **Activación multi-capítulo:** diferida hasta evidencia de demanda. `capitulo_id` presente en entidades centrales; sin selector ni gobernanza distribuida en MDP.
+- **Modelo 2 de señales** (publicación directa para todos los Curador Comunidad): diferido, controlado por feature flag `senales_publicacion_directa_modelo_2` (default false).
+- **Migración Prisma 6.x → 7.x:** diferida. Reevaluar en mes 6-12 cuando Prisma 7 tenga al menos 2 versiones minor estables y el ecosystem lo soporte oficialmente. El cambio es acotado (mover `url`/`directUrl` a `prisma.config.ts` + ajustar instanciación del cliente), sin impacto en el modelo de datos.
+- **Modelo de notificaciones in-app:** diferido. MDP usa email transaccional (Resend); sin entidad `Notificacion` ni bandeja in-app.
+- **Google OAuth:** diferible sin costo de refactor (decisión IMPORTANTE, Sección 13).
+- **Integración con CRM externo:** no contemplada en MDP.
+
+---
+
 ## Cierre
 
-Este documento y `prisma/schema.prisma` constituyen el entregable del Sprint 0 incremental. El schema está validado con Prisma 6.18 (`prisma validate` sin errores, exit 0). No se escribió código de producto, no se instalaron dependencias (la validación se ejecutó vía `npx`, sin modificar `package.json`), no se ejecutaron migraciones ni se configuraron servicios externos.
+Este documento y `prisma/schema.prisma` constituyen el entregable del Sprint 0 incremental, con las correcciones del chat estratégico incorporadas (RevisionSenial como entidad separada con rondas; enums `HorizonteTemporal` y `EstadoEvento` confirmados; vínculo Miembro↔AliadoFundador con `rol_en_aliado` sin rol especial; Prisma 6.x como decisión consciente). El schema está validado con Prisma 6 (`The schema at prisma/schema.prisma is valid`, exit 0, con variables de entorno presentes). No se escribió código de producto, no se instalaron dependencias (la validación se ejecutó vía `npx`, sin modificar `package.json`), no se ejecutaron migraciones ni se configuraron servicios externos.
 
 Conforme al proceso definido en los lineamientos (Parte III), este entregable regresa al chat estratégico para revisión arquitectónica. **Ningún sprint de construcción inicia sin aprobación explícita.**
 
 ---
 
-*Speculative Futures CDMX · Documento de Arquitectura Sprint 0 Incremental · v1.0*
+*Speculative Futures CDMX · Documento de Arquitectura Sprint 0 Incremental · v1.1*
 *Change Consulting · Mayo 2026*

@@ -60,20 +60,22 @@ enum EstadoSenial {
   publicada
 }
 
-/// Horizonte temporal de una señal.
-/// NOTA: los lineamientos nombran el campo pero no fijan su dominio de valores.
-/// Estos valores son provisionales (ver Sección 13, decisión DIFERIBLE).
+/// Horizonte temporal de una señal. Dominio confirmado por el chat estratégico.
 enum HorizonteTemporal {
-  corto_plazo
-  mediano_plazo
-  largo_plazo
+  ahora
+  emergente
+  mediano
+  largo
+  horizonte
 }
 
-/// Decisión emitida por un Curador Core sobre una propuesta de señal.
+/// Decisión emitida por un Curador Core sobre una propuesta de señal,
+/// por ronda de revisión. Permite múltiples rondas (aprobada | rechazada |
+/// requiere_edicion) sobre una misma señal.
 enum DecisionRevision {
   aprobada
   rechazada
-  comentario
+  requiere_edicion
 }
 
 /// Modalidad de un evento.
@@ -83,14 +85,15 @@ enum ModalidadEvento {
   hibrido
 }
 
-/// Ciclo de vida de un evento.
-/// NOTA: los lineamientos no fijan el dominio; se infiere de la acción
-/// "cancelar evento" (prompt §6). Ver Sección 13.
+/// Ciclo de vida de un evento. Dominio confirmado por el chat estratégico.
 enum EstadoEvento {
   borrador
-  publicado
+  programado
+  lleno
+  en_curso
+  realizado
   cancelado
-  finalizado
+  pospuesto
 }
 
 /// Estado de la asistencia de un miembro a un evento.
@@ -204,9 +207,13 @@ model Miembro {
   /// Si >= 3 → publicación directa con auditoría post-hoc (auditada = false).
   senialesPublicadasAprobadas Int             @default(0) @map("seniales_publicadas_aprobadas")
   estado                      EstadoMiembro   @default(activo)
-  /// Vínculo opcional con un aliado fundador al que el miembro representa;
-  /// otorga el rol de permisos "aliado_fundador" (ver Sección 6).
+  /// Vínculo opcional (muchos-a-uno) con el aliado fundador que el miembro
+  /// representa. NO otorga rol_contribucion especial — es solo afiliación
+  /// institucional. El rol de permisos "aliado_fundador" se deriva de este
+  /// vínculo a nivel de aplicación, sin alterar rol_contribucion.
   aliadoFundadorId            String?         @map("aliado_fundador_id") @db.Uuid
+  /// Rol del miembro dentro del aliado (texto libre, ej. "Directora de foresight").
+  rolEnAliado                 String?         @map("rol_en_aliado")
   fechaRegistro               DateTime        @default(now()) @map("fecha_registro")
   updatedAt                   DateTime        @updatedAt @map("updated_at")
 
@@ -291,19 +298,26 @@ model Senial {
 
 /// Registro de revisión editorial de una propuesta de señal (feedback +
 /// decisión del Curador Core). Soporta el dashboard de curación y la fase de
-/// calibración de los Curador Comunidad (lineamientos §2).
+/// calibración de los Curador Comunidad (lineamientos §2). Admite múltiples
+/// rondas por señal (campo `ronda`). El revisor debe ser un Miembro con rol
+/// curador_core (se valida en aplicación + RLS). El contador
+/// Miembro.seniales_publicadas_aprobadas se deriva de los registros con
+/// estado = aprobada.
 model RevisionSenial {
-  id         String           @id @default(uuid()) @db.Uuid
-  senialId   String           @map("senial_id") @db.Uuid
-  revisorId  String           @map("revisor_id") @db.Uuid
-  decision   DecisionRevision
-  comentario String?
-  createdAt  DateTime         @default(now()) @map("created_at")
+  id                  String           @id @default(uuid()) @db.Uuid
+  senialId            String           @map("senial_id") @db.Uuid
+  revisorId           String           @map("revisor_id") @db.Uuid
+  estado              DecisionRevision
+  comentarioEditorial String?          @map("comentario_editorial")
+  ronda               Int              @default(1)
+  fechaRevision       DateTime         @default(now()) @map("fecha_revision")
 
   senial  Senial  @relation(fields: [senialId], references: [id], onDelete: Cascade)
   revisor Miembro @relation("RevisionesRealizadas", fields: [revisorId], references: [id])
 
+  @@unique([senialId, ronda]) // una revisión por ronda por señal
   @@index([senialId])
+  @@index([estado])
   @@map("revision_senial")
 }
 
