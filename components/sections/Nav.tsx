@@ -7,10 +7,9 @@ import { C, FONT, meta } from '@/lib/tokens';
 interface NavProps {
   onJoin: () => void;
   onComunidad: () => void;
-  onContact: () => void;
 }
 
-export function Nav({ onJoin, onComunidad, onContact }: NavProps) {
+export function Nav({ onJoin, onComunidad }: NavProps) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -24,6 +23,7 @@ export function Nav({ onJoin, onComunidad, onContact }: NavProps) {
     ['Eventos', '#eventos'],
     ['Territorios', '#territorios'],
     ['Manifiesto', '#manifiesto'],
+    ['Contacto', '#contacto'],
   ];
 
   return (
@@ -57,13 +57,6 @@ export function Nav({ onJoin, onComunidad, onContact }: NavProps) {
             </a>
           ))}
         </div>
-        <button
-          onClick={onContact}
-          className="navlinks"
-          style={{ ...meta, color: C.BODY, fontSize: 12.5, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-        >
-          Contacto
-        </button>
         <button
           onClick={onComunidad}
           style={{ ...meta, color: C.CAL, fontSize: 12.5, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}

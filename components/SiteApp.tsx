@@ -31,7 +31,7 @@ export function SiteApp() {
 
   return (
     <div style={{ background: '#062424', color: '#F4F7F5', minHeight: '100vh' }}>
-      <Nav onJoin={() => setJoin(true)} onComunidad={() => setComunidad(true)} onContact={() => setContact(true)} />
+      <Nav onJoin={() => setJoin(true)} onComunidad={() => setComunidad(true)} />
       <Hero variant={variant} onJoin={() => setJoin(true)} headline={headline} showGrid={showGrid} />
       <NextEvent onContact={() => setContact(true)} />
       <Territorios showGrid={showGrid} />
